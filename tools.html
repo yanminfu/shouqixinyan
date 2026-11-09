@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>研究工具库 · 手启心言</title>
+<link rel="preconnect" href="https://fonts.loli.net">
+<link href="https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@600;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232E6E67'/%3E%3C/svg%3E">
+</head>
+<body>
+<div id="railSlot"></div>
+<div id="mobileTopSlot"></div>
+<div class="main">
+  <div class="wrap">
+    <div class="page-head rv in">
+      <div class="page-eyebrow">RESEARCH TOOLKIT</div>
+      <h1 class="page-title">研究工具库</h1>
+      <p class="page-desc">观察量表、编码规程、创造力测验、问卷与访谈工具——把“具身化”变成可观察、可量化、可迭代的研究“度量衡”。智能体的课后诊断功能直接内化了其中的三维观察框架。</p>
+    </div>
+    <div class="tools-grid" id="toolsGrid"></div>
+    <div style="height:50px"></div>
+  </div>
+  <div id="footerSlot"></div>
+</div>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/md.js"></script>
+<script src="assets/js/main.js"></script>
+<script>
+document.getElementById('railSlot').innerHTML = renderRail('tools.html');
+document.getElementById('mobileTopSlot').innerHTML = renderMobileTop('tools.html');
+document.getElementById('footerSlot').innerHTML = renderFooter();
+renderTools();
+</script>
+</body>
+</html>

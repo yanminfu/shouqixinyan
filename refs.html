@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文献库 · 手启心言</title>
+<link rel="preconnect" href="https://fonts.loli.net">
+<link href="https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@600;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232E6E67'/%3E%3C/svg%3E">
+</head>
+<body>
+<div id="railSlot"></div>
+<div id="mobileTopSlot"></div>
+<div class="main">
+  <div class="wrap">
+    <div class="page-head rv in">
+      <div class="page-eyebrow">REFERENCES</div>
+      <h1 class="page-title">参考文献库</h1>
+      <p class="page-desc">沿具身认知、儿童创造力、双重编码三条理论线索，兼收政策文件——智能体的理论根基全部可溯源、无侵权。</p>
+    </div>
+    <div id="refsWrap"></div>
+    <div style="height:50px"></div>
+  </div>
+  <div id="footerSlot"></div>
+</div>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/md.js"></script>
+<script src="assets/js/main.js"></script>
+<script>
+document.getElementById('railSlot').innerHTML = renderRail('refs.html');
+document.getElementById('mobileTopSlot').innerHTML = renderMobileTop('refs.html');
+document.getElementById('footerSlot').innerHTML = renderFooter();
+renderRefs();
+</script>
+</body>
+</html>

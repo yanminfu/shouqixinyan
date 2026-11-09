@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>手启心言 · 智能体</title>
+<meta name="description" content="面向乡镇学校的具身化创意表达课程实施智能体：课前低资源课程适配、课中物成言立表达支架、课后课堂记录驱动迭代。">
+<link rel="preconnect" href="https://fonts.loli.net">
+<link href="https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@600;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232E6E67'/%3E%3C/svg%3E">
+</head>
+<body class="agent-body">
+<div id="railSlot"></div>
+<div id="mobileTopSlot"></div>
+
+<div class="chat-wrap">
+  <!-- 顶栏 -->
+  <header class="chat-topbar">
+    <div class="t-ava" id="topAva"></div>
+    <div>
+      <div class="t-name">手启心言 <span class="t-tag">对话型智能体</span></div>
+      <div class="t-sub">面向乡镇学校的具身化创意表达课程实施智能体</div>
+    </div>
+    <div class="topbar-actions">
+      <span class="status-pill" id="statusPill"><span class="dot"></span><span id="statusText">连接中…</span></span>
+      <button class="icon-btn" id="btnSettings" title="API 配置"></button>
+      <button class="icon-btn" id="btnNewTop" title="开启新对话"></button>
+    </div>
+  </header>
+
+  <!-- 消息区 -->
+  <div class="chat-scroll" id="chatScroll">
+    <!-- 欢迎态 -->
+    <div class="welcome" id="welcome">
+      <svg class="welcome-deco float" style="top:12%;left:10%;--fr:-14deg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M18 11V6.5a1.5 1.5 0 0 0-3 0V11m0-5.5v-2a1.5 1.5 0 0 0-3 0V11m0-7.5a1.5 1.5 0 0 0-3 0V12m-3-4.5a1.5 1.5 0 0 1 3 0V15"/></svg>
+      <svg class="welcome-deco float" style="top:20%;right:12%;--fr:10deg;animation-delay:1.4s" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.12 15.88M14.47 14.48 20 20"/></svg>
+      <svg class="welcome-deco float" style="bottom:14%;left:16%;--fr:6deg;animation-delay:2.2s" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11 20A7 7 0 0 1 4 13c0-4 3-8 9-9 5-1 7-1 7-1s0 2-1 7c-1 6-5 9-8 10z"/></svg>
+      <svg class="welcome-deco float" style="bottom:22%;right:9%;--fr:-8deg;animation-delay:.8s" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+
+      <div class="welcome-inner">
+        <div class="welcome-logo" id="welcomeLogo"></div>
+        <h1>手启心言</h1>
+        <div class="w-sub">面向乡镇学校的具身化创意表达课程实施智能体</div>
+        <div class="w-traits">
+          <span class="chip chip-teal">身体参与</span>
+          <span class="chip chip-terra">材料互动</span>
+          <span class="chip chip-amber">语言生成</span>
+          <span class="chip">持续迭代</span>
+        </div>
+
+        <div class="welcome-card">
+          <ol>
+            <li><span><b>课前·低资源课程适配</b>——告诉我孩子的年龄、人数、课时、现有材料和场地，我生成符合“四阶模式”的完整课程方案（含材料替代、步骤卡、提问卡）；</span></li>
+            <li><span><b>课中·「物成言立」表达支架</b>——描述孩子完成的作品（可附照片），我给您层层递进的提问卡，帮孩子为作品命名、讲述、题诗；</span></li>
+            <li><span><b>课后·课堂记录迭代</b>——记下课堂观察，我按“身体参与—环境参与—生成性”三维框架诊断，给出下节课的调整建议。</span></li>
+          </ol>
+          <div class="wc-note">也可以向我了解项目进展、作品矩阵编码、TTCT、问卷访谈设计等研究问题。</div>
+        </div>
+
+        <div class="suggests" id="suggests"></div>
+      </div>
+    </div>
+    <!-- 对话态 -->
+    <div class="msgs" id="msgs" style="display:none"></div>
+  </div>
+
+  <!-- 输入区 -->
+  <div class="composer">
+    <div class="composer-inner">
+      <div class="composer-modes" id="modeChips"></div>
+      <div class="composer-box">
+        <div class="attach-previews" id="attachPreviews" style="display:none"></div>
+        <textarea id="input" rows="2" placeholder="向手启心言提问：课程设计、表达支架、课堂诊断…"></textarea>
+        <div class="composer-bar">
+          <button class="attach-btn" id="btnAttach" title="上传学生作品照片（OCR/图像识别）"></button>
+          <input type="file" id="fileInput" accept="image/*" multiple hidden>
+          <span class="composer-hint"><kbd>Enter</kbd> 发送 <span style="opacity:.4">·</span> <kbd>Shift+Enter</kbd> 换行</span>
+          <button class="send-btn" id="btnSend" disabled></button>
+        </div>
+      </div>
+      <div class="composer-tip">手启心言由「以手启思，以身达意」项目组研发 · 生成内容供教学参考，请结合课堂实际灵活调整</div>
+    </div>
+  </div>
+</div>
+
+<!-- 课前适配表单弹层 -->
+<div class="overlay" id="planOverlay">
+  <div class="dialog">
+    <button class="d-close" data-close="planOverlay" id="planClose"></button>
+    <h3><span id="planIco"></span>低资源课程适配</h3>
+    <div class="d-sub">填写课堂基本条件，智能体将生成符合「四阶模式」的完整实施方案（含材料替代、步骤卡、提问卡与课堂组织建议）。</div>
+    <div class="field-grid">
+      <div class="field"><label>儿童年龄</label>
+        <select id="fAge">
+          <option>混龄（6—12岁）</option><option>低年级（6—8岁）</option>
+          <option>中年级（9—11岁）</option><option>高年级（12岁以上）</option>
+        </select>
+      </div>
+      <div class="field"><label>人数</label><input id="fCount" type="number" min="1" max="60" value="12"></div>
+      <div class="field"><label>课时</label>
+        <select id="fDuration"><option>90分钟</option><option>40分钟</option><option>60分钟</option><option>2课时（约120分钟）</option></select>
+      </div>
+      <div class="field"><label>场地</label>
+        <select id="fVenue"><option>普通教室</option><option>活动室/礼堂</option><option>户外院落</option></select>
+      </div>
+    </div>
+    <div class="field"><label>现有材料（多选）</label>
+      <div class="mat-picks" id="matPicks"></div>
+    </div>
+    <div class="field"><label>其他材料</label><input id="fCustom" placeholder="如：挂历、纽扣、瓶盖…"></div>
+    <div class="field"><label>期望主题（选填）</label><input id="fTheme" placeholder="如：我的家乡 / 春天 / 非遗竹编…"></div>
+    <button class="btn btn-primary" id="btnPlanGo">生成课程方案</button>
+  </div>
+</div>
+
+<!-- API 配置弹层 -->
+<div class="overlay" id="cfgOverlay">
+  <div class="dialog">
+    <button class="d-close" data-close="cfgOverlay" id="cfgClose"></button>
+    <h3><span id="cfgIco"></span>模型接口配置</h3>
+    <div class="d-sub">默认使用项目组内置接口，无需配置即可体验。如需更换为自己的 Key（保存在本机浏览器，不会上传）。</div>
+    <div class="field"><label>API Base URL（OpenAI 兼容）</label><input id="cfgBase" placeholder="https://api.deepseek.com/v1"></div>
+    <div class="field"><label>模型</label><input id="cfgModel" placeholder="deepseek-chat"></div>
+    <div class="field"><label>API Key</label><input id="cfgKey" type="password" placeholder="sk-…"></div>
+    <div class="field"><label>多模态识别（作品照片 OCR / 图像理解）</label>
+      <select id="cfgVision">
+        <option value="auto">自动：接口支持图像时随消息发送</option>
+        <option value="off">关闭：仅发送文字描述</option>
+      </select>
+      <div class="d-sub" style="margin-top:6px">提示：deepseek-chat 仅支持文字；切换至支持 vision 的 OpenAI 兼容接口后可识别作品照片中的文字与画面。</div>
+    </div>
+    <button class="btn btn-primary" id="btnCfgSave">保存配置</button>
+    <button class="btn btn-paper" id="btnCfgReset" style="margin-top:10px">恢复默认</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/md.js"></script>
+<script src="assets/js/main.js"></script>
+<script src="assets/js/agent.js"></script>
+</body>
+</html>
