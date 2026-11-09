@@ -24,7 +24,6 @@
     </div>
     <div class="topbar-actions">
       <span class="status-pill" id="statusPill"><span class="dot"></span><span id="statusText">连接中…</span></span>
-      <button class="icon-btn" id="btnSettings" title="API 配置"></button>
       <button class="icon-btn" id="btnNewTop" title="开启新对话"></button>
     </div>
   </header>
@@ -111,27 +110,6 @@
     <div class="field"><label>其他材料</label><input id="fCustom" placeholder="如：挂历、纽扣、瓶盖…"></div>
     <div class="field"><label>期望主题（选填）</label><input id="fTheme" placeholder="如：我的家乡 / 春天 / 非遗竹编…"></div>
     <button class="btn btn-primary" id="btnPlanGo">生成课程方案</button>
-  </div>
-</div>
-
-<!-- API 配置弹层 -->
-<div class="overlay" id="cfgOverlay">
-  <div class="dialog">
-    <button class="d-close" data-close="cfgOverlay" id="cfgClose"></button>
-    <h3><span id="cfgIco"></span>模型接口配置</h3>
-    <div class="d-sub">默认使用项目组内置接口，无需配置即可体验。如需更换为自己的 Key（保存在本机浏览器，不会上传）。</div>
-    <div class="field"><label>API Base URL（OpenAI 兼容）</label><input id="cfgBase" placeholder="https://api.deepseek.com/v1"></div>
-    <div class="field"><label>模型</label><input id="cfgModel" placeholder="deepseek-chat"></div>
-    <div class="field"><label>API Key</label><input id="cfgKey" type="password" placeholder="sk-…"></div>
-    <div class="field"><label>多模态识别（作品照片 OCR / 图像理解）</label>
-      <select id="cfgVision">
-        <option value="auto">自动：接口支持图像时随消息发送</option>
-        <option value="off">关闭：仅发送文字描述</option>
-      </select>
-      <div class="d-sub" style="margin-top:6px">提示：deepseek-chat 仅支持文字；切换至支持 vision 的 OpenAI 兼容接口后可识别作品照片中的文字与画面。</div>
-    </div>
-    <button class="btn btn-primary" id="btnCfgSave">保存配置</button>
-    <button class="btn btn-paper" id="btnCfgReset" style="margin-top:10px">恢复默认</button>
   </div>
 </div>
 

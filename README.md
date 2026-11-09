@@ -28,7 +28,7 @@ powershell -ExecutionPolicy Bypass -File server/dev-server.ps1
 
 ## 智能体技术架构
 
-- **模型**：OpenAI 兼容接口（默认 DeepSeek，浏览器端流式 SSE），顶栏 ⚙ 可更换 Base URL / Model / Key（存本机 localStorage）
+- **模型**：OpenAI 兼容接口（默认 DeepSeek，浏览器端流式 SSE）；接口参数内置在 `agent.js` 的 `DEFAULT_CFG`，页面对外不可见（评审/教师视角零配置）；如需更换 Key 直接改该常量即可
 - **大脑**：`assets/js/agent.js` 内置完整系统提示词（角色/理论根基/低资源原则/表达支架/课后迭代/边界伦理，源自申报书与公开材料）+ 项目知识库上下文（作品/教案/工具自动同步自 `data.js`）
 - **三大功能**：课前适配（支持表单引导）、课中表达支架、课后三维诊断，通过模式 chips 与提示词结构控制输出格式
 - **降级保障**：模型接口不可达时自动切换内置规则引擎（`Offline`），仍可演示三大功能的结构化输出
@@ -68,4 +68,4 @@ powershell Compress-Archive -Path publish\* -DestinationPath site-bundle.zip -Fo
 
 ---
 
-项目团队：严泯福 · 管乾宇 · 高琳蕊 · 许睿涵 · 蔡明涵 ｜ 指导老师：江雪 ｜ 华中师范大学文学院
+项目团队：严泯福 · 管乾宇 · 高琳蕊 · 许睿涵 · 蔡明涵 · 王路洋 ｜ 指导老师：江雪 ｜ 华中师范大学文学院

@@ -8,17 +8,16 @@
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => Array.from(document.querySelectorAll(s));
 
-  /* ── 图标注入 ── */
-  $('#topAva').innerHTML = ICONS.hand;
-  $('#welcomeLogo').innerHTML = ICONS.hand;
-  $('#btnSettings').innerHTML = ICONS.gear;
-  $('#btnNewTop').innerHTML = ICONS.plus;
-  $('#btnSend').innerHTML = ICONS.send;
-  $('#btnAttach').innerHTML = ICONS.clip;
-  $('#planIco').innerHTML = ICONS.package;
-  $('#cfgIco').innerHTML = ICONS.gear;
-  $('#planClose').innerHTML = ICONS.x;
-  $('#cfgClose').innerHTML = ICONS.x;
+  /* ── 图标注入（空安全） ── */
+  const setHtml = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+  setHtml('topAva', ICONS.hand);
+  setHtml('welcomeLogo', ICONS.hand);
+  setHtml('btnSettings', ICONS.gear);
+  setHtml('btnNewTop', ICONS.plus);
+  setHtml('btnSend', ICONS.send);
+  setHtml('btnAttach', ICONS.clip);
+  setHtml('planIco', ICONS.package);
+  setHtml('planClose', ICONS.x);
 
   /* ── 侧栏与顶栏 ── */
   $('#railSlot').innerHTML = renderRail('agent.html', { newChat: true, historySlot: true, navLinks: true });
@@ -263,7 +262,7 @@
       </div>`;
     const body = m.content
       ? `<div class="md ${busy && isLast ? 'streaming' : ''}">${MD.render(m.content)}</div>`
-      : `<div class="typing"><i></i><i></i><i></i></div>`;
+      : `<div class="typing"><i></i><i></i><i></i></div><div class="think-hint">手启心言正在构思课程方案，首次生成约需 5—15 秒，请稍候…</div>`;
     return `<div class="msg msg-ai">
       <div class="ai-head"><div class="ai-ava">${ICONS.hand}</div><span class="ai-name">手启心言</span>${tools}</div>
       <div class="bubble">${body}</div>
@@ -833,25 +832,6 @@ ${DB.project.parent}——${DB.project.parentSub}
     closeOverlay('planOverlay');
     setMode('plan', true);
     send(msg, []);
-  });
-
-  /* ═══════════ API 配置 ═══════════ */
-  function fillCfg() {
-    const c = loadCfg();
-    $('#cfgBase').value = c.baseUrl; $('#cfgModel').value = c.model;
-    $('#cfgKey').value = c.apiKey; $('#cfgVision').value = c.vision;
-  }
-  $('#btnSettings').addEventListener('click', () => { fillCfg(); openOverlay('cfgOverlay'); });
-  $('#btnCfgSave').addEventListener('click', () => {
-    saveCfg({ baseUrl: $('#cfgBase').value.trim(), model: $('#cfgModel').value.trim(), apiKey: $('#cfgKey').value.trim(), vision: $('#cfgVision').value });
-    closeOverlay('cfgOverlay');
-    setStatus('就绪');
-    toast('配置已保存到本机浏览器');
-  });
-  $('#btnCfgReset').addEventListener('click', () => {
-    localStorage.removeItem(CFG_KEY);
-    fillCfg();
-    toast('已恢复默认配置');
   });
 
   /* ═══════════ 状态灯 ═══════════ */

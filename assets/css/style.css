@@ -453,7 +453,7 @@ a:hover > .brand-mark, .rail-brand:hover .brand-mark { transform: rotate(0deg) s
 .tl-item.doing h4 { color: var(--terra-deep); }
 
 /* 团队 */
-.team-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+.team-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; }
 .member { text-align: center; padding: 26px 12px; border-radius: var(--r-lg); background: var(--paper-2); border: 1px solid var(--line); transition: all .3s var(--ease-out); }
 .member:hover { transform: translateY(-4px); box-shadow: var(--sh-sm); border-color: var(--teal-mid); }
 .member .ava {
@@ -904,6 +904,7 @@ a:hover > .brand-mark, .rail-brand:hover .brand-mark { transform: rotate(0deg) s
 .typing i { width: 8px; height: 8px; border-radius: 50%; background: var(--teal-mid); animation: tp 1.2s infinite; }
 .typing i:nth-child(2) { animation-delay: .18s; } .typing i:nth-child(3) { animation-delay: .36s; }
 @keyframes tp { 0%, 60%, 100% { transform: translateY(0); opacity: .4; } 30% { transform: translateY(-6px); opacity: 1; } }
+.think-hint { font-size: 12px; color: var(--ink-faint); margin-top: 8px; letter-spacing: .03em; }
 
 /* Markdown 排版 */
 .md h1, .md h2, .md h3, .md h4 { font-family: var(--serif); color: var(--ink); line-height: 1.5; }

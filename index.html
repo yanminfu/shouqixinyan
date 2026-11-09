@@ -226,7 +226,7 @@ $('timelineWrap', DB.stages.map((s) => `
     <h4>${s.name}${s.status === 'doing' ? ' · 进行中' : ''}</h4>
   </div>`).join(''));
 
-const avaColors = ['#C05F35', '#2E6E67', '#8A6415', '#3E8A80', '#9E4A26'];
+const avaColors = ['#C05F35', '#2E6E67', '#8A6415', '#3E8A80', '#9E4A26', '#6E8B5E'];
 $('teamGrid', DB.project.team.map((m, i) => `
   <div class="member rv rv-d${i + 1}">
     <div class="ava" style="background:linear-gradient(135deg,${avaColors[i]},${avaColors[i]}BB)">${m[0]}</div>
