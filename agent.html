@@ -120,13 +120,10 @@
   <div class="dialog">
     <button class="d-close" data-close="modelOverlay" id="modelClose"></button>
     <h3><span id="modelIco"></span>模型服务</h3>
-    <div class="d-sub">选择驱动「手启心言」的大模型。内置服务开箱即用；自有 Key 仅保存在本机浏览器，不会上传。</div>
+    <div class="d-sub">选择驱动「手启心言」的大模型，三项服务均已内置 Key、开箱即用；也可以填入自己的 Key 或修改模型 ID（仅保存在本机浏览器）。</div>
     <div id="providerList" style="margin-top:16px"></div>
-    <div id="customFields" style="display:none">
-      <div class="field"><label>API Base URL（OpenAI 兼容）</label><input id="mBase" placeholder="https://api.example.com/v1"></div>
-      <div class="field"><label>模型 ID</label><input id="mModel" placeholder="如 moonshot-v1-8k / glm-4-flash"></div>
-    </div>
-    <div class="field" id="keyFieldWrap"><label id="keyLabel">API Key</label><input id="mKey" type="password" placeholder="sk-…（仅保存在本机）"></div>
+    <div class="field" id="modelFieldWrap" style="display:none"><label>模型 ID</label><input id="mModel" placeholder="模型 ID，如 glm-5.3 / doubao-seed-2-1-pro-260915"></div>
+    <div class="field" id="keyFieldWrap" style="display:none"><label id="keyLabel">API Key</label><input id="mKey" type="password" placeholder="已内置 Key；填这里可替换为自己的（仅保存在本机）"></div>
     <button class="btn btn-primary" id="btnModelSave">保存并切换</button>
   </div>
 </div>

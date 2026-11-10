@@ -22,7 +22,7 @@
   setHtml('modelIco', ICONS.gear);
 
   /* ── 侧栏与顶栏 ── */
-  $('#railSlot').innerHTML = renderRail('agent.html', { newChat: true, historySlot: true, navLinks: true });
+  $('#railSlot').innerHTML = renderRail('agent.html', { newChat: true, historySlot: true, navLinks: false });
   $('#mobileTopSlot').innerHTML = renderMobileTop('agent.html');
 
   /* ═══════════ AI 配置：多模型服务（内置 DeepSeek + Kimi/MiniMax/GLM/自定义） ═══════════ */
@@ -31,10 +31,8 @@
   const BUILTIN_KEY = 'sk-1539db3c2e3b47a8adcebc8599abd9b8';
   const PROVIDERS = {
     deepseek: { name: 'DeepSeek', short: 'DeepSeek', desc: '内置默认 · 开箱即用，无需配置', baseUrl: 'https://api.deepseek.com/v1', model: 'deepseek-chat', builtin: true },
-    kimi:     { name: 'Kimi · 月之暗面', short: 'Kimi', desc: 'moonshot-v1-8k · 中文与长文本能力强', baseUrl: 'https://api.moonshot.cn/v1', model: 'moonshot-v1-8k' },
-    minimax:  { name: 'MiniMax', short: 'MiniMax', desc: 'MiniMax-Text-01 · 综合与多模态能力', baseUrl: 'https://api.minimax.chat/v1', model: 'MiniMax-Text-01' },
-    glm:      { name: '智谱 GLM', short: 'GLM', desc: 'glm-4-flash · 响应快、有免费额度', baseUrl: 'https://open.bigmodel.cn/api/paas/v4', model: 'glm-4-flash' },
-    custom:   { name: '自定义接口', short: '自定义', desc: '任何 OpenAI 兼容的大模型服务', baseUrl: '', model: '', isCustom: true },
+    glm:      { name: '智谱 GLM', short: 'GLM', desc: 'glm-5.3 · Key 已内置，开箱即用', baseUrl: 'https://open.bigmodel.cn/api/paas/v4', model: 'glm-5.3', key: 'cc00ae5cfd5043b38f2517748c3118ff.Ycxdcgk4mYa17JA5' },
+    doubao:   { name: '豆包 · 火山方舟', short: '豆包', desc: 'doubao-seed-2.1-pro · Key 已内置', baseUrl: 'https://ark.cn-beijing.volces.com/api/v3', model: 'doubao-seed-2-1-pro-260915', key: 'VxCgNvLTE.ChA3WVF2ZUZXUVpnb0Z6cTNQEKyc1_kHGAEqEPFBOgY_YUrAsQ65ngMjnXI.aUpJ2RMWfB9Ap9mR21kfE5sU4BcTObienUsofbm5BQAnmGq67ujFIsJGHJMH5N6CfFNtT__IgJg52037HPtuSgeZ' },
   };
   let noImageModels = []; // 本次会话中已确认不支持图片的 model，避免重复失败
   let currentProvider = 'deepseek';
@@ -47,9 +45,9 @@
     const p = PROVIDERS[currentProvider];
     const keys = loadKeys()[currentProvider] || {};
     return {
-      baseUrl: p.isCustom ? (keys.baseUrl || '') : p.baseUrl,
-      model: p.isCustom ? (keys.model || '') : p.model,
-      apiKey: p.builtin ? BUILTIN_KEY : (keys.key || ''),
+      baseUrl: p.baseUrl,
+      model: keys.model || p.model,
+      apiKey: p.builtin ? BUILTIN_KEY : (keys.key || p.key || ''),
       vision: 'auto', // auto=自动尝试随消息发送图片；不支持时自动降级纯文本
     };
   }
@@ -966,11 +964,11 @@ ${DB.project.parent}——${DB.project.parentSub}
   function fillModelDialog() {
     const p = PROVIDERS[selProvider];
     const k = loadKeys()[selProvider] || {};
-    $('#customFields').style.display = p.isCustom ? '' : 'none';
+    $('#modelFieldWrap').style.display = p.builtin ? 'none' : '';
     $('#keyFieldWrap').style.display = p.builtin ? 'none' : '';
-    $('#keyLabel').textContent = p.builtin ? 'API Key' : `API Key（${p.name}）`;
-    if (p.isCustom) { $('#mBase').value = k.baseUrl || ''; $('#mModel').value = k.model || ''; }
-    $('#mKey').value = p.builtin ? '' : (k.key || '');
+    $('#keyLabel').textContent = `API Key（${p.name}）`;
+    $('#mModel').value = k.model || p.model;
+    $('#mKey').value = k.key || '';
   }
   $('#modelPill').addEventListener('click', () => {
     selProvider = currentProvider;
@@ -980,20 +978,20 @@ ${DB.project.parent}——${DB.project.parentSub}
   });
   $('#providerList').addEventListener('change', (e) => {
     selProvider = e.target.value;
-    renderProviderList();
+    // 只切换样式，不重建 DOM（避免点击过程中的节点替换问题）
+    $$('.pv-item').forEach((el) => el.classList.toggle('on', el.querySelector('input').value === selProvider));
     fillModelDialog();
   });
   $('#btnModelSave').addEventListener('click', () => {
     const p = PROVIDERS[selProvider];
-    const key = $('#mKey').value.trim();
-    if (!p.builtin && !key) { toast(`请填写 ${p.name} 的 API Key`); return; }
-    if (p.isCustom && (!$('#mBase').value.trim() || !$('#mModel').value.trim())) {
-      toast('请填写接口地址与模型 ID'); return;
-    }
     const keys = loadKeys();
-    if (p.isCustom) keys[selProvider] = { baseUrl: $('#mBase').value.trim(), model: $('#mModel').value.trim(), key };
-    else if (!p.builtin) keys[selProvider] = { ...(keys[selProvider] || {}), key };
-    localStorage.setItem(KEYS_KEY, JSON.stringify(keys));
+    if (!p.builtin) {
+      keys[selProvider] = {
+        key: $('#mKey').value.trim(),           // 留空则回落到内置 Key
+        model: $('#mModel').value.trim() || p.model,
+      };
+      localStorage.setItem(KEYS_KEY, JSON.stringify(keys));
+    }
     currentProvider = selProvider;
     saveCfg();
     noImageModels = [];
