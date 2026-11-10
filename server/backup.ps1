@@ -1,5 +1,6 @@
 $root = Split-Path $PSScriptRoot -Parent
-$out = Join-Path $root "backup-v4.1-20261110.zip"
+$name = if ($args.Count -gt 0) { $args[0] } else { "backup" }
+$out = Join-Path $root "$name.zip"
 if (Test-Path $out) { Remove-Item $out -Force }
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $zip = [System.IO.Compression.ZipFile]::Open($out, 'Create')

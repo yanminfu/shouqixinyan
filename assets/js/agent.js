@@ -18,25 +18,42 @@
   setHtml('btnAttach', ICONS.clip);
   setHtml('planIco', ICONS.package);
   setHtml('planClose', ICONS.x);
+  setHtml('modelClose', ICONS.x);
+  setHtml('modelIco', ICONS.gear);
 
   /* ── 侧栏与顶栏 ── */
   $('#railSlot').innerHTML = renderRail('agent.html', { newChat: true, historySlot: true, navLinks: true });
   $('#mobileTopSlot').innerHTML = renderMobileTop('agent.html');
 
-  /* ═══════════ AI 配置 ═══════════ */
+  /* ═══════════ AI 配置：多模型服务（内置 DeepSeek + Kimi/MiniMax/GLM/自定义） ═══════════ */
   const CFG_KEY = 'shouqi-ai-config';
-  const DEFAULT_CFG = {
-    baseUrl: 'https://api.deepseek.com/v1',
-    model: 'deepseek-chat',
-    apiKey: 'sk-1539db3c2e3b47a8adcebc8599abd9b8',
-    vision: 'auto', // auto=自动尝试随消息发送图片；off=仅文字
+  const KEYS_KEY = 'shouqi-provider-keys';
+  const BUILTIN_KEY = 'sk-1539db3c2e3b47a8adcebc8599abd9b8';
+  const PROVIDERS = {
+    deepseek: { name: 'DeepSeek', short: 'DeepSeek', desc: '内置默认 · 开箱即用，无需配置', baseUrl: 'https://api.deepseek.com/v1', model: 'deepseek-chat', builtin: true },
+    kimi:     { name: 'Kimi · 月之暗面', short: 'Kimi', desc: 'moonshot-v1-8k · 中文与长文本能力强', baseUrl: 'https://api.moonshot.cn/v1', model: 'moonshot-v1-8k' },
+    minimax:  { name: 'MiniMax', short: 'MiniMax', desc: 'MiniMax-Text-01 · 综合与多模态能力', baseUrl: 'https://api.minimax.chat/v1', model: 'MiniMax-Text-01' },
+    glm:      { name: '智谱 GLM', short: 'GLM', desc: 'glm-4-flash · 响应快、有免费额度', baseUrl: 'https://open.bigmodel.cn/api/paas/v4', model: 'glm-4-flash' },
+    custom:   { name: '自定义接口', short: '自定义', desc: '任何 OpenAI 兼容的大模型服务', baseUrl: '', model: '', isCustom: true },
   };
   let noImageModels = []; // 本次会话中已确认不支持图片的 model，避免重复失败
+  let currentProvider = 'deepseek';
+
+  function loadKeys() { try { return JSON.parse(localStorage.getItem(KEYS_KEY) || '{}'); } catch { return {}; } }
   function loadCfg() {
-    try { return { ...DEFAULT_CFG, ...JSON.parse(localStorage.getItem(CFG_KEY) || '{}') }; }
-    catch { return { ...DEFAULT_CFG }; }
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem(CFG_KEY) || '{}'); } catch { /* 忽略 */ }
+    currentProvider = saved.provider && PROVIDERS[saved.provider] ? saved.provider : 'deepseek';
+    const p = PROVIDERS[currentProvider];
+    const keys = loadKeys()[currentProvider] || {};
+    return {
+      baseUrl: p.isCustom ? (keys.baseUrl || '') : p.baseUrl,
+      model: p.isCustom ? (keys.model || '') : p.model,
+      apiKey: p.builtin ? BUILTIN_KEY : (keys.key || ''),
+      vision: 'auto', // auto=自动尝试随消息发送图片；不支持时自动降级纯文本
+    };
   }
-  function saveCfg(c) { localStorage.setItem(CFG_KEY, JSON.stringify(c)); }
+  function saveCfg() { localStorage.setItem(CFG_KEY, JSON.stringify({ provider: currentProvider })); }
 
   /* ═══════════ 系统提示词（移植自项目组提示词包） ═══════════ */
   const SYS_PROMPT = `# 角色设定
@@ -831,6 +848,47 @@ ${DB.project.parent}——${DB.project.parentSub}
     }
   });
 
+  /* 历史对话导出 / 导入（跨浏览器、跨设备携带，无需账号） */
+  function exportSessions() {
+    if (!sessions.length) { toast('暂无可导出的对话'); return; }
+    const blob = new Blob([JSON.stringify(sessions, null, 1)], { type: 'application/json;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `手启心言-对话备份-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast(`已导出 ${sessions.length} 条对话`);
+  }
+  function importSessions() {
+    const inp = document.createElement('input');
+    inp.type = 'file';
+    inp.accept = '.json,application/json';
+    inp.onchange = () => {
+      const f = inp.files[0];
+      if (!f) return;
+      const r = new FileReader();
+      r.onload = () => {
+        try {
+          const data = JSON.parse(r.result);
+          if (!Array.isArray(data)) throw new Error('格式不正确');
+          const exist = new Set(sessions.map((s) => s.id));
+          let n = 0;
+          data.forEach((s) => {
+            if (s && s.id && Array.isArray(s.msgs) && !exist.has(s.id)) { sessions.push(s); n++; }
+          });
+          sessions.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+          persist();
+          renderMessages();
+          toast(n ? `已导入 ${n} 条对话` : '没有新对话可导入（可能已存在）');
+        } catch (err) {
+          toast('导入失败：文件不是有效的对话备份');
+        }
+      };
+      r.readAsText(f);
+    };
+    inp.click();
+  }
+
   /* 新对话 */
   function newChat() {
     if (busy) return;
@@ -842,8 +900,10 @@ ${DB.project.parent}——${DB.project.parentSub}
   $('#btnNewTop').addEventListener('click', newChat);
   document.body.addEventListener('click', (e) => { if (e.target.closest('#railNewChat')) newChat(); });
 
-  /* 历史点击 / 删除 */
+  /* 历史点击 / 删除 / 导出导入 */
   document.body.addEventListener('click', async (e) => {
+    if (e.target.closest('#histExport')) { exportSessions(); return; }
+    if (e.target.closest('#histImport')) { importSessions(); return; }
     const del = e.target.closest('[data-del]');
     if (del) {
       e.stopPropagation();
@@ -889,6 +949,60 @@ ${DB.project.parent}——${DB.project.parentSub}
     send(msg, []);
   });
 
+  /* ═══════════ 模型服务切换 ═══════════ */
+  let selProvider = 'deepseek';
+  function setModelPill() {
+    const el = $('#modelName');
+    if (el) el.textContent = PROVIDERS[currentProvider].short;
+  }
+  function renderProviderList() {
+    $('#providerList').innerHTML = Object.entries(PROVIDERS).map(([id, p]) => `
+      <label class="pv-item ${id === selProvider ? 'on' : ''}">
+        <input type="radio" name="pv" value="${id}" ${id === selProvider ? 'checked' : ''}>
+        <div class="pv-body"><b>${p.name}</b><span>${p.desc}</span></div>
+        ${id === currentProvider ? '<em>使用中</em>' : ''}
+      </label>`).join('');
+  }
+  function fillModelDialog() {
+    const p = PROVIDERS[selProvider];
+    const k = loadKeys()[selProvider] || {};
+    $('#customFields').style.display = p.isCustom ? '' : 'none';
+    $('#keyFieldWrap').style.display = p.builtin ? 'none' : '';
+    $('#keyLabel').textContent = p.builtin ? 'API Key' : `API Key（${p.name}）`;
+    if (p.isCustom) { $('#mBase').value = k.baseUrl || ''; $('#mModel').value = k.model || ''; }
+    $('#mKey').value = p.builtin ? '' : (k.key || '');
+  }
+  $('#modelPill').addEventListener('click', () => {
+    selProvider = currentProvider;
+    renderProviderList();
+    fillModelDialog();
+    openOverlay('modelOverlay');
+  });
+  $('#providerList').addEventListener('change', (e) => {
+    selProvider = e.target.value;
+    renderProviderList();
+    fillModelDialog();
+  });
+  $('#btnModelSave').addEventListener('click', () => {
+    const p = PROVIDERS[selProvider];
+    const key = $('#mKey').value.trim();
+    if (!p.builtin && !key) { toast(`请填写 ${p.name} 的 API Key`); return; }
+    if (p.isCustom && (!$('#mBase').value.trim() || !$('#mModel').value.trim())) {
+      toast('请填写接口地址与模型 ID'); return;
+    }
+    const keys = loadKeys();
+    if (p.isCustom) keys[selProvider] = { baseUrl: $('#mBase').value.trim(), model: $('#mModel').value.trim(), key };
+    else if (!p.builtin) keys[selProvider] = { ...(keys[selProvider] || {}), key };
+    localStorage.setItem(KEYS_KEY, JSON.stringify(keys));
+    currentProvider = selProvider;
+    saveCfg();
+    noImageModels = [];
+    closeOverlay('modelOverlay');
+    setModelPill();
+    setStatus('就绪');
+    toast(`已切换至 ${p.name}`);
+  });
+
   /* ═══════════ 状态灯 ═══════════ */
   function setStatus(txt, off) {
     $('#statusText').textContent = txt;
@@ -897,10 +1011,7 @@ ${DB.project.parent}——${DB.project.parentSub}
 
   /* ═══════════ 启动 ═══════════ */
   function boot() {
-    // 恢复上次的对话（刷新/重开页面后直接续聊）
-    if (!activeId && sessions.length) activeId = sessions[0].id;
-    const cur = active();
-    if (cur && cur.mode) mode = cur.mode;
+    // 注意：不自动跳入历史对话——每次打开从欢迎页起手，历史在左侧栏一键可达
     renderModeChips();
     renderSuggests();
     renderHistory();

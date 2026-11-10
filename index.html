@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.loli.net">
 <link href="https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@600;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232E6E67'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 </head>
 <body>
 <div id="railSlot"></div>
@@ -88,11 +88,10 @@
       <div class="sec-head rv">
         <div class="sec-eyebrow">课程模式</div>
         <h2 class="sec-title">四阶递进 · 课内外贯通</h2>
-        <p class="sec-desc">所有课程方案必须严格遵循的四环节结构，来自具身认知理论与三地支教实践的双向打磨。下图为建议时间占比，可按实际课时（40 / 45 / 60 分钟一课时）折算。</p>
+        <p class="sec-desc">所有课程方案必须严格遵循的四环节结构，来自具身认知理论与三地支教实践的双向打磨。</p>
       </div>
-      <div class="four-flow" id="fourFlow"></div>
-      <div class="ff-note rv">“未成词而先有象”——物先于词，手先于口，做中学，评中进。</div>
-      <div style="text-align:center;margin-top:30px" class="rv">
+      <div class="four-grid" id="fourGrid"></div>
+      <div style="text-align:center;margin-top:36px" class="rv">
         <a class="btn btn-paper" href="lessons.html"><span id="ctaIcon3"></span>查看全部四阶课例</a>
       </div>
     </div>
@@ -187,13 +186,13 @@ $('triIco1', ICONS.leaf); $('triIco2', ICONS.hand); $('triIco3', ICONS.pen);
 
 $('frameChips', DB.flows.map((f) => `<a class="hero-frame-chip" href="agent.html?mode=${f.tag === '课前' ? 'plan' : f.tag === '课中' ? 'scaffold' : 'iterate'}">${f.tag} · ${f.title}</a>`).join(''));
 
-$('fourFlow', DB.fourSteps.map((s, i) => `
-  <div class="ff-node rv rv-d${i + 1}" style="--fc:${s.color}" title="${s.desc}">
-    <div class="ff-dot">${s.no}</div>
-    <b>${s.name}</b>
-    <span class="en">${s.en}</span>
-    <p>${s.short}</p>
-    <em>${s.pct}</em>
+$('fourGrid', DB.fourSteps.map((s, i) => `
+  <div class="four-card rv rv-d${i + 1}" style="--fc:${s.color}">
+    <div class="four-no">${s.no}</div>
+    <div class="four-name">${s.name}</div>
+    <div class="four-en">${s.en}</div>
+    <div class="four-desc">${s.desc}</div>
+    <span class="four-time">${s.time}</span>
   </div>`).join(''));
 
 $('flowGrid', DB.flows.map((f, i) => `

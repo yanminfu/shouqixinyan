@@ -63,7 +63,7 @@
           <div><div class="brand-name">手启心言</div><div class="brand-sub">具身化创意表达课程智能体</div></div>
         </a>
         ${opts.newChat ? `<button class="rail-newchat" id="railNewChat">${ICONS.plus} 开启新对话</button>` : ''}
-        ${opts.historySlot ? '<nav class="rail-history" id="railHistory"><h6>对话记录</h6><div id="histList"></div></nav>' : `<nav class="rail-nav">${links}</nav>`}
+        ${opts.historySlot ? '<nav class="rail-history" id="railHistory"><h6><span>对话记录</span><span class="hist-tools"><button id="histExport" title="导出全部对话">导出</button><button id="histImport" title="导入对话备份">导入</button></span></h6><div id="histList"></div></nav>' : `<nav class="rail-nav">${links}</nav>`}
         ${opts.navLinks !== false && opts.historySlot ? `<nav class="rail-nav" style="border-top:1px dashed var(--line);padding-top:10px;margin-top:4px">${links}</nav>` : ''}
         <div class="rail-news">
           <h6><span class="pulse"></span>美育快讯</h6>

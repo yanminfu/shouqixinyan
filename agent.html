@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.loli.net">
 <link href="https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@600;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232E6E67'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 </head>
 <body class="agent-body">
 <div id="railSlot"></div>
@@ -23,6 +23,7 @@
       <div class="t-sub">面向乡镇学校的具身化创意表达课程实施智能体</div>
     </div>
     <div class="topbar-actions">
+      <button class="status-pill" id="modelPill" title="切换模型服务" style="cursor:pointer;border-style:dashed"><span id="modelName">DeepSeek</span> ▾</button>
       <span class="status-pill" id="statusPill"><span class="dot"></span><span id="statusText">连接中…</span></span>
       <button class="icon-btn" id="btnNewTop" title="开启新对话"></button>
     </div>
@@ -111,6 +112,22 @@
     <div class="field"><label>期望主题（选填）</label><input id="fTheme" placeholder="如：我的家乡 / 春天 / 非遗竹编…"></div>
     <div class="field"><label>地域与在地资源（选填）</label><input id="fRegion" placeholder="如：宜昌远安山区，有竹林、梯田；或：城区托管班，只有教室"></div>
     <button class="btn btn-primary" id="btnPlanGo">生成课程方案</button>
+  </div>
+</div>
+
+<!-- 模型服务弹层 -->
+<div class="overlay" id="modelOverlay">
+  <div class="dialog">
+    <button class="d-close" data-close="modelOverlay" id="modelClose"></button>
+    <h3><span id="modelIco"></span>模型服务</h3>
+    <div class="d-sub">选择驱动「手启心言」的大模型。内置服务开箱即用；自有 Key 仅保存在本机浏览器，不会上传。</div>
+    <div id="providerList" style="margin-top:16px"></div>
+    <div id="customFields" style="display:none">
+      <div class="field"><label>API Base URL（OpenAI 兼容）</label><input id="mBase" placeholder="https://api.example.com/v1"></div>
+      <div class="field"><label>模型 ID</label><input id="mModel" placeholder="如 moonshot-v1-8k / glm-4-flash"></div>
+    </div>
+    <div class="field" id="keyFieldWrap"><label id="keyLabel">API Key</label><input id="mKey" type="password" placeholder="sk-…（仅保存在本机）"></div>
+    <button class="btn btn-primary" id="btnModelSave">保存并切换</button>
   </div>
 </div>
 
