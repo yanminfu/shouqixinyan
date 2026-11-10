@@ -94,6 +94,8 @@ h1, h2, h3, .serif { font-family: var(--serif); }
   border-right: 1px solid var(--line);
   display: flex; flex-direction: column;
   z-index: 50;
+  overflow-y: auto;
+  scrollbar-width: thin;
 }
 
 .rail-brand {
@@ -354,35 +356,63 @@ a:hover > .brand-mark, .rail-brand:hover .brand-mark { transform: rotate(0deg) s
 }
 .hero-frame-input .go svg { width: 14px; height: 14px; }
 
-/* 四阶模式 */
-.four-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
-.four-card {
+/* 四阶流程图（图形化呈现） */
+.four-flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 36px; }
+.ff-node {
   background: var(--paper-2); border: 1px solid var(--line);
-  border-radius: var(--r-lg); padding: 28px 24px;
-  position: relative; overflow: hidden;
-  transition: all .35s var(--ease-out);
+  border-radius: 22px; padding: 24px 18px 18px;
+  text-align: center; position: relative;
+  box-shadow: var(--sh-sm);
+  transition: transform .3s var(--ease-out), box-shadow .3s;
 }
-.four-card:hover { transform: translateY(-6px); box-shadow: var(--sh-md); border-color: transparent; }
-.four-card::before {
-  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px;
-  background: var(--fc, var(--teal));
-  transform: scaleX(0); transform-origin: left;
-  transition: transform .4s var(--ease-out);
+.ff-node:hover { transform: translateY(-5px); box-shadow: var(--sh-md); }
+.ff-node::after {
+  content: "→"; position: absolute; right: -33px; top: 44px;
+  font-size: 24px; color: var(--ink-faint); font-family: var(--serif);
 }
-.four-card:hover::before { transform: scaleX(1); }
-.four-no {
-  font-family: var(--serif); font-size: 44px; font-weight: 900;
-  color: var(--fc, var(--teal)); opacity: .18; line-height: 1;
+.ff-node:last-child::after { display: none; }
+.ff-dot {
+  width: 54px; height: 54px; margin: 0 auto 12px;
+  border-radius: 50%;
+  background: var(--fc);
+  color: #fff; font-family: var(--serif); font-weight: 900; font-size: 23px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--sh-sm);
 }
-.four-name { font-family: var(--serif); font-size: 21px; font-weight: 900; letter-spacing: .1em; margin: 8px 0 4px; }
-.four-en { font-size: 10.5px; color: var(--ink-faint); letter-spacing: .18em; text-transform: uppercase; }
-.four-desc { margin-top: 14px; font-size: 13px; color: var(--ink-soft); line-height: 1.9; }
-.four-time {
-  margin-top: 16px; display: inline-block;
-  font-size: 11px; color: var(--fc, var(--teal));
-  background: var(--paper); border: 1px dashed var(--line);
-  padding: 3px 11px; border-radius: 99px;
+.ff-node b { font-family: var(--serif); font-size: 20px; font-weight: 900; letter-spacing: .14em; display: block; }
+.ff-node .en { display: block; font-size: 9.5px; letter-spacing: .18em; color: var(--ink-faint); text-transform: uppercase; margin-top: 3px; }
+.ff-node p { margin-top: 12px; font-size: 12.5px; color: var(--ink-soft); line-height: 1.8; min-height: 44px; }
+.ff-node em {
+  display: inline-block; font-style: normal; font-size: 11.5px; font-weight: 600;
+  color: var(--fc); background: var(--paper); border: 1px dashed var(--line);
+  padding: 3px 14px; border-radius: 99px; margin-top: 8px;
 }
+.ff-note { text-align: center; font-size: 12.5px; color: var(--ink-faint); margin-top: 30px; font-family: var(--serif); letter-spacing: .06em; }
+@media (max-width: 860px) {
+  .four-flow { grid-template-columns: 1fr; gap: 34px; max-width: 420px; margin: 0 auto; }
+  .ff-node::after { content: "↓"; right: auto; left: 50%; top: auto; bottom: -30px; transform: translateX(-50%); }
+  .ff-node p { min-height: 0; }
+}
+
+/* 智能体时间分配图示（彩条） */
+.alloc-bar { margin-top: 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); padding: 13px 15px 11px; }
+.alloc-title { font-size: 12px; font-weight: 600; color: var(--ink-soft); margin-bottom: 9px; letter-spacing: .03em; }
+.alloc-track { display: flex; height: 26px; border-radius: 8px; overflow: hidden; gap: 2px; }
+.alloc-track i { display: block; height: 100%; border-radius: 2px; min-width: 4px; transition: width .8s var(--ease-out); }
+.alloc-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 9px; }
+.alloc-legend span { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--ink-soft); }
+.alloc-legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+/* 侧栏美育快讯 */
+.rail-news { margin: 4px 14px 12px; border-top: 1px dashed var(--line); padding-top: 10px; }
+.rail-news h6 { font-size: 10.5px; letter-spacing: .2em; color: var(--ink-faint); padding: 0 4px 6px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.rail-news h6 .pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--terra); animation: pulseDot 2.2s infinite; }
+.rn-item { display: block; padding: 7px 6px; border-radius: 9px; transition: background .18s; cursor: pointer; }
+.rn-item:hover { background: var(--teal-ghost); }
+.rn-item b { display: block; font-size: 11.5px; font-weight: 500; color: var(--ink-soft); line-height: 1.55; }
+.rn-item span { font-size: 9.5px; color: var(--ink-faint); letter-spacing: .04em; }
+.rn-more { font-size: 10px; color: var(--teal); padding: 4px 6px 2px; display: inline-block; }
+.rn-note { font-size: 9px; color: var(--ink-faint); padding: 6px 6px 0; line-height: 1.5; }
 
 /* 课前课中课后 全流程 */
 .flow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
@@ -1026,15 +1056,49 @@ a:hover > .brand-mark, .rail-brand:hover .brand-mark { transform: rotate(0deg) s
 .mobile-top {
   display: none;
   position: sticky; top: 0; z-index: 60;
-  background: rgba(253, 251, 244, .9);
+  background: rgba(253, 251, 244, .92);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
-  padding: 10px 18px;
+  padding: 10px 14px;
   align-items: center; gap: 10px;
 }
-.mobile-top .brand-mark { width: 34px; height: 34px; border-radius: 10px; }
+.mobile-top .brand-mark { width: 34px; height: 34px; border-radius: 10px; flex: none; }
 .mobile-top .brand-mark svg { width: 18px; height: 18px; }
-.mobile-top b { font-family: var(--serif); letter-spacing: .1em; }
-.mobile-top nav { margin-left: auto; display: flex; gap: 12px; font-size: 13px; }
-.mobile-top nav a { color: var(--ink-soft); }
+.mobile-top b { font-family: var(--serif); letter-spacing: .1em; flex: none; }
+.mobile-top nav {
+  margin-left: auto;
+  display: flex; gap: 16px;
+  font-size: 13px;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.mobile-top nav::-webkit-scrollbar { display: none; }
+.mobile-top nav a { color: var(--ink-soft); flex: none; }
 .mobile-top nav a.active { color: var(--teal); font-weight: 700; }
+@media (max-width: 520px) {
+  .mobile-top b { display: none; }
+}
+
+/* 手机端对话页适配：避让右下角平台悬浮标，压缩留白 */
+@media (max-width: 860px) {
+  .chat-topbar { padding: 0 14px; gap: 10px; height: 54px; }
+  .chat-topbar .t-sub { display: none; }
+  .chat-topbar .t-name { font-size: 15px; }
+  .status-pill { white-space: nowrap; font-size: 10.5px; padding: 4px 9px; }
+  .icon-btn { width: 32px; height: 32px; }
+  .msgs { padding: 16px 12px 12px; gap: 20px; }
+  .msg-user .bubble { max-width: 94%; }
+  .msg-ai .bubble { padding: 14px 16px; font-size: 13.5px; }
+  .composer { padding: 6px 10px 44px; }
+  .composer-inner { max-width: 100%; }
+  .composer-modes { overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; padding-bottom: 2px; }
+  .composer-modes::-webkit-scrollbar { display: none; }
+  .mode-chip { flex: none; }
+  .composer-hint { display: none; }
+  /* 发送键移到左侧，避开右下角平台悬浮标 */
+  .send-btn { order: -1; margin-left: 0; margin-right: 6px; flex: none; }
+  .welcome-card li { font-size: 12px !important; }
+  .chat-scroll { -webkit-overflow-scrolling: touch; }
+}

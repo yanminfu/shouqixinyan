@@ -45,6 +45,7 @@
     { href: 'lessons.html', label: '教案库', icon: 'book' },
     { href: 'tools.html', label: '研究工具库', icon: 'ruler' },
     { href: 'refs.html', label: '文献库', icon: 'lib' },
+    { href: 'changelog.html', label: '更新日志', icon: 'refresh' },
   ];
 
   window.renderRail = function (active, opts) {
@@ -53,6 +54,8 @@
       <a class="rail-link ${active === n.href ? 'active' : ''}" href="${n.href}">
         ${ICONS[n.icon]}<span>${n.label}</span>${n.badge ? `<span class="rail-badge">${n.badge}</span>` : ''}
       </a>`).join('');
+    const news = ((window.DB && DB.news) || []).slice(0, 3).map((x) => `
+      <div class="rn-item"><b>${MD.esc(x.title)}</b><span>${x.src} · ${x.date}</span></div>`).join('');
     return `
       <aside class="rail">
         <a class="rail-brand" href="index.html">
@@ -62,6 +65,11 @@
         ${opts.newChat ? `<button class="rail-newchat" id="railNewChat">${ICONS.plus} 开启新对话</button>` : ''}
         ${opts.historySlot ? '<nav class="rail-history" id="railHistory"><h6>对话记录</h6><div id="histList"></div></nav>' : `<nav class="rail-nav">${links}</nav>`}
         ${opts.navLinks !== false && opts.historySlot ? `<nav class="rail-nav" style="border-top:1px dashed var(--line);padding-top:10px;margin-top:4px">${links}</nav>` : ''}
+        <div class="rail-news">
+          <h6><span class="pulse"></span>美育快讯</h6>
+          ${news}
+          <div class="rn-note">素材来自公开教育新闻，仅作教研参考</div>
+        </div>
         <div class="rail-foot">
           <b>华中师范大学文学院</b><br>
           文欣杯项目实践衍生品<br>
@@ -106,6 +114,7 @@
           <div><h5>站内</h5>
             <a href="agent.html">手启心言智能体</a><a href="works.html">作品数据库</a>
             <a href="lessons.html">教案库</a><a href="tools.html">研究工具库</a><a href="refs.html">文献库</a>
+            <a href="changelog.html">更新日志</a>
           </div>
           <div><h5>项目</h5>
             <a href="index.html#four">四阶课程模式</a><a href="index.html#dims">三维观察框架</a>

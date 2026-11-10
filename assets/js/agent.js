@@ -62,7 +62,10 @@
 
 - 材料优先零成本/低成本：旧报纸、旧挂历、广告单、瓦楞纸、纸箱、自然物（树叶、树枝、泥土、石子、蒲公英、麦秆）、碎布头、纽扣、竹篾、稻草；胶可用米汤/面糊替代。
 - 提供"材料替代方案"：每个推荐材料必须给出至少一种更易得的替代品。
-- 课时弹性：默认 40—90 分钟可裁剪，标注可省略环节。
+- 地域与在地资源：主动利用当地的自然材料（梯田、河流、竹林、农作物）、非遗技艺（竹编、蓝印花布等）与乡土场景，让课程长在孩子的生活世界里，而不是从城市课堂搬下来。
+- 乡镇儿童特点：设计时考虑留守儿童亲子陪伴少、屏幕依赖、公开表达机会少等现实——多用小组互助降低表达压力，多给"先说后写"的缓冲，多用身体操作打开话头；只作教学设计考量，绝不给儿童贴标签、不做心理诊断。
+- 可获帮助：善用支教志愿者、"爱心托管班"体系与高校资源（讲师、材料、展演机会），把一次课接成长效支持。
+- 课时弹性：各环节按**占比**设计（不写死分钟数），教师按本校一课时（40/45/60 分钟均可）折算；标注可省略环节。
 - 场地不限：教室、活动室、户外院落均可，给出相应组织建议。
 - 混龄常见：给出大带小、分层任务策略。
 - 安全红线：剪刀、刻刀、针线、热水/热胶须教师辅助或替代方案，必须在教案中标注。
@@ -94,24 +97,24 @@
 - 篇幅充足但不注水；步骤要写到"新教师照着做不会卡壳"的颗粒度。`;
 
   const MODE_PROMPTS = {
-    plan: `现在执行【低资源课程适配】功能。教师会提供：儿童年龄/年级、人数、课时、现有材料、场地（可能还有主题方向）。
+    plan: `现在执行【低资源课程适配】功能。教师会提供：儿童年龄/年级、人数、课时、现有材料、场地（可能还有主题方向、地域与在地资源）。
 
-请严格按以下结构输出一份可直接实施的课程方案：
+请严格按以下结构输出一份可直接实施的课程方案（各环节一律用**时间占比**表述，不写死分钟数，便于教师按本校一课时 40/45/60 分钟折算）：
 
 ## 一、课程定位
-课程名称、适用年龄、人数与分组建议、课时安排（标注可裁剪弹性）、对应课型（纸艺/泥塑/布艺/拼贴/编织/自然物拼贴/综合材料）。
+课程名称、适用年龄、人数与分组建议、课时弹性说明（占比制，可裁剪）、对应课型（纸艺/泥塑/布艺/拼贴/编织/自然物拼贴/综合材料）。
 
 ## 二、材料方案
-表格：材料名称 | 用途 | 低成本/零成本替代方案。凡有安全风险的工具单独标注教师辅助方式。
+表格：材料名称 | 用途 | 低成本/零成本替代方案。凡有安全风险的工具单独标注教师辅助方式。**若教师提供了地域信息，须单列一行"在地资源利用"（当地自然材料/非遗技艺/乡土场景）。**
 
-## 三、四阶教学流程
-### 环节一 触材启思（约X分钟）
+## 三、四阶教学流程（每环节标注约占全课的百分比，四项合计 100%）
+### 环节一 触材启思（约占 X%）
 导入语（写出教师可以直接说的话）、材料唤醒方式、预期儿童反应。
-### 环节二 手运心生（约X分钟）
+### 环节二 手运心生（约占 X%）
 任务说明、分层/分组策略（含混龄处理）、教师支架（半成品、步骤卡、巡视话术）。
-### 环节三 物成言立（约X分钟）
+### 环节三 物成言立（约占 X%）
 命名—讲述—题诗的引导流程与逐层提问卡（观察→感受→联想→表达）。
-### 环节四 评鉴生新（约X分钟）
+### 环节四 评鉴生新（约占 X%）
 互评量规（3 条以内、儿童听得懂的语言）、二次创作建议、展示方式。
 
 ## 四、步骤卡
@@ -124,7 +127,11 @@
 空间布置、材料分发与回收、时间弹性预案（课时不够怎么办）、常见突发情况（孩子不动手/说"我不会"/抢着说话）的应对话术。
 
 ## 七、三维观察要点
-本节课在身体参与、环境参与、生成性上分别观察什么、记录什么（供课后迭代使用）。`,
+本节课在身体参与、环境参与、生成性上分别观察什么、记录什么（供课后迭代使用）。
+
+## 八、时间分配
+最后一行严格按以下格式输出（用于页面生成图示，数字为整数、合计 100）：
+【时间分配】触材启思 15%｜手运心生 40%｜物成言立 25%｜评鉴生新 20%`,
     scaffold: `现在执行【"物成言立"表达支架】功能。教师会描述一个孩子已经完成的手工作品（材料、样子、孩子制作中的表现，可能还有孩子随口说过的话）。
 
 请严格按以下结构输出：
@@ -170,7 +177,7 @@
 不超过 3 条，每条满足：针对某一维度、明天就能执行、成本趋零。写清"调整什么环节、怎么调、为什么"。
 
 ## 三、修改后教案要点
-基于调整建议，给出修订版教案的要点清单（不必重写全文，写清改动处与新的时间安排）。
+基于调整建议，给出修订版教案的要点清单（不必重写全文，写清改动处与新的时间占比）。
 
 ## 四、给教师的三个自我提问
 帮助教师形成反思习惯的三个问题，与本节课的具体情况相关，不空泛。
@@ -205,7 +212,7 @@
   let activeId = null;
   try { sessions = JSON.parse(localStorage.getItem(STORE_KEY) || '[]'); } catch { sessions = []; }
   const persist = () => {
-    localStorage.setItem(STORE_KEY, JSON.stringify(sessions.slice(0, 30)));
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(sessions.slice(0, 30))); } catch { /* 存储超限等异常不影响对话 */ }
     renderHistory();
   };
   const active = () => sessions.find((s) => s.id === activeId);
@@ -260,13 +267,45 @@
         <button class="ai-act" data-act="copy" title="复制">${ICONS.copy}</button>
         <button class="ai-act" data-act="md" title="导出 Markdown">${ICONS.download}</button>
       </div>`;
+    const alloc = m.role === 'assistant' && m.content ? timeAllocBar(m.content) : null;
     const body = m.content
-      ? `<div class="md ${busy && isLast ? 'streaming' : ''}">${MD.render(m.content)}</div>`
+      ? `<div class="md ${busy && isLast ? 'streaming' : ''}">${MD.render(alloc ? alloc.clean : m.content)}</div>${alloc ? alloc.html : ''}`
       : `<div class="typing"><i></i><i></i><i></i></div><div class="think-hint">手启心言正在构思课程方案，首次生成约需 5—15 秒，请稍候…</div>`;
     return `<div class="msg msg-ai">
       <div class="ai-head"><div class="ai-ava">${ICONS.hand}</div><span class="ai-name">手启心言</span>${tools}</div>
       <div class="bubble">${body}</div>
     </div>`;
+  }
+
+  /* 解析时间分配并生成图示：优先【时间分配】行，否则从环节标题中的"环节名（约 X%）"抓取（江老师反馈：图示化呈现） */
+  const ALLOC_COLORS = { 触材启思: '#C05F35', 手运心生: '#2E6E67', 物成言立: '#D59A3C', 评鉴生新: '#3E8A80' };
+  function timeAllocBar(text) {
+    let segs = [];
+    const mark = text.match(/【时间分配】\s*([^\n]+)/);
+    if (mark) {
+      mark[1].split(/[｜|]/).forEach((part) => {
+        const mm = part.match(/(触材启思|手运心生|物成言立|评鉴生新)[^\d]*(\d+)\s*%?/);
+        if (mm) segs.push({ name: mm[1], pct: +mm[2] });
+      });
+    } else {
+      const seen = {};
+      const re = /(触材启思|手运心生|物成言立|评鉴生新)[^，。\n]{0,8}?(\d+)\s*%/g;
+      let m;
+      while ((m = re.exec(text)) !== null) {
+        if (!seen[m[1]]) { seen[m[1]] = true; segs.push({ name: m[1], pct: +m[2] }); }
+      }
+    }
+    if (segs.length < 2) return null;
+    const total = segs.reduce((a, s) => a + s.pct, 0) || 100;
+    const clean = text.replace(/【时间分配】[^\n]*(\n|$)/, '');
+    const html = `<div class="alloc-bar">
+      <div class="alloc-title">⏱ 四阶时间分配（按全课占比，可据实际课时折算）</div>
+      <div class="alloc-track">${segs.map((s) =>
+        `<i style="width:${(s.pct / total) * 100}%;background:${ALLOC_COLORS[s.name] || '#999'}" title="${s.name} ${s.pct}%"></i>`).join('')}</div>
+      <div class="alloc-legend">${segs.map((s) =>
+        `<span><i style="background:${ALLOC_COLORS[s.name] || '#999'}"></i>${s.name} ${s.pct}%</span>`).join('')}</div>
+    </div>`;
+    return { clean, html };
   }
 
   function renderMessages() {
@@ -312,7 +351,7 @@
   /* ═══════════ API 调用（流式） ═══════════ */
   function buildMessages(history, withImages) {
     const cfg = loadCfg();
-    return history.slice(-14).map((m) => {
+    return history.slice(-20).map((m) => {
       const images = withImages ? (m.images || []) : [];
       if (images.length) {
         return {
@@ -331,44 +370,51 @@
   async function callLLM(system, history, onToken) {
     const cfg = loadCfg();
     const tryImage = cfg.vision === 'auto' && !noImageModels.includes(cfg.model);
-    const res = await fetch(cfg.baseUrl.replace(/\/+$/, '') + '/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + cfg.apiKey },
-      body: JSON.stringify({
-        model: cfg.model, temperature: 0.4, stream: true,
-        messages: [{ role: 'system', content: system }, ...buildMessages(history, tryImage)],
-      }),
-    });
-    if (!res.ok) {
-      const t = await res.text().catch(() => '');
-      // 400 可能是多模态不支持：降级为纯文本重试一次
-      if (res.status === 400 && tryImage) {
-        noImageModels.push(cfg.model);
-        return callLLM(system, history, onToken);
+    const ctrl = new AbortController();
+    const killer = setTimeout(() => ctrl.abort(), 90000); // 90 秒无响应判定网络挂死，触发离线降级
+    try {
+      const res = await fetch(cfg.baseUrl.replace(/\/+$/, '') + '/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + cfg.apiKey },
+        signal: ctrl.signal,
+        body: JSON.stringify({
+          model: cfg.model, temperature: 0.4, stream: true,
+          messages: [{ role: 'system', content: system }, ...buildMessages(history, tryImage)],
+        }),
+      });
+      if (!res.ok) {
+        const t = await res.text().catch(() => '');
+        // 400 可能是多模态不支持：降级为纯文本重试一次
+        if (res.status === 400 && tryImage) {
+          noImageModels.push(cfg.model);
+          return callLLM(system, history, onToken);
+        }
+        throw new Error(`模型接口返回 ${res.status}：${t.slice(0, 120)}`);
       }
-      throw new Error(`模型接口返回 ${res.status}：${t.slice(0, 120)}`);
-    }
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-    let full = '', buffer = '';
-    for (;;) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop() || '';
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (!trimmed.startsWith('data:')) continue;
-        const payload = trimmed.slice(5).trim();
-        if (payload === '[DONE]') continue;
-        try {
-          const delta = JSON.parse(payload).choices?.[0]?.delta?.content || '';
-          if (delta) { full += delta; onToken(full); }
-        } catch { /* 忽略不完整分片 */ }
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let full = '', buffer = '';
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed.startsWith('data:')) continue;
+          const payload = trimmed.slice(5).trim();
+          if (payload === '[DONE]') continue;
+          try {
+            const delta = JSON.parse(payload).choices?.[0]?.delta?.content || '';
+            if (delta) { full += delta; onToken(full); }
+          } catch { /* 忽略不完整分片 */ }
+        }
       }
+      return full;
+    } finally {
+      clearTimeout(killer);
     }
-    return full;
   }
 
   /* ═══════════ 离线规则引擎（降级演示） ═══════════ */
@@ -386,9 +432,12 @@
       const hasPaper = mats.some((m) => m.includes('报纸') || m.includes('挂历'));
       const theme = /家乡|梯田|山/.test(text) ? '我的家乡' : /春/.test(text) ? '春天' : /风/.test(text) ? '风的样子' : /非遗|竹编/.test(text) ? '非遗新玩' : '春天';
       const type = hasPaper ? '拼贴诗' : /泥|黏土/.test(text) ? '泥塑' : /布/.test(text) ? '布艺' : '自然物拼贴';
-      const t1 = Math.max(8, Math.round(minutes * .15)), t2 = Math.round(minutes * .42),
-            t3 = Math.round(minutes * .25), t4 = Math.max(8, minutes - t1 - t2 - t3);
-      const sub = minutes >= 100 ? '（可分 2 次课完成，第二课时从「物成言立」开始）' : minutes <= 45 ? '（时间紧张时可省略「评鉴生新」的二次创作，保留互评）' : '';
+      const P1 = 15, P2 = 40, P3 = 25, P4 = 20;
+      const sub = minutes >= 100 ? '（建议分 2 次课完成，第二课时从「物成言立」开始）' : minutes <= 45 ? '（时间紧张时可省略「评鉴生新」的二次创作，保留互评）' : '';
+      const region = /远安|梯田|山区/.test(text) ? '远安山区：梯田地貌、竹林与自然物丰富'
+        : /崇阳|白霓|竹/.test(text) ? '崇阳白霓：非遗竹编与蓝印花布可对接在地手艺人'
+        : /新洲|武汉/.test(text) ? '武汉新洲：旧报刊易获取，可衔接城市近郊乡土场景'
+        : '当地自然材料与乡土场景（可向老人、手艺人打听）';
       const matRows = (mats.length ? mats : ['旧报纸/广告单', '自然物（树叶、树枝）', '剪刀', '胶水'])
         .map((m) => {
           const kb = Object.entries(DB.materialKB).find(([k]) => m.includes(k.slice(0, 2)) || k.includes(m.slice(0, 2)));
@@ -399,31 +448,32 @@
       return `## 一、课程定位
 - **课程名称**：《${theme}》——${type}创意表达课
 - **适用年龄**：${age}；**人数**：约 ${count} 人，建议 ${Math.max(2, Math.round(count / 6))} 人一组合 ${Math.ceil(count / 6)} 组（混龄组注意“大带小”搭配）
-- **课时**：${minutes} 分钟 ${sub}
+- **课时**：按占比设计，弹性可裁剪 ${sub}；折算参考：40 分钟一课时≈每个百分点 0.4 分钟，60 分钟≈0.6 分钟
 - **课型**：${type}（纸艺/泥塑/布艺/拼贴/编织/自然物拼贴/综合材料）
 
 ## 二、材料方案
 | 材料 | 用途 | 低成本/零成本替代 |
 |---|---|---|
 ${matRows}
+| 🏡 在地资源 | 乡土课程资源 | ${region} |
 | ⚠️ 剪刀${/针线/.test(mats.join('')) ? '、针线' : ''} | 工具 | **教师统一收发、全程辅助**；低年级可改用撕、折代替剪 |
 
-## 三、四阶教学流程
-### 环节一 触材启思（约 ${t1} 分钟）
+## 三、四阶教学流程（占比为建议值，可据学情微调）
+### 环节一 触材启思（约占 ${P1}%）
 教师可以这样说：**“先别急着做，闭上眼睛摸一摸这些材料——它们让你想起了什么画面、什么声音？”** 请学生闭目触摸、自由拼摆 3 分钟，再请 2—3 人说“第一感觉”。预期反应：学生会先关注材料的触感与气味，这正是“未成词而先有象”。
 
-### 环节二 手运心生（约 ${t2} 分钟）
+### 环节二 手运心生（约占 ${P2}%）
 - **任务**：围绕“${theme}”用现有材料完成一件作品，**做法不设标准答案**。
 - **支架**：教师提供 1—2 件半成品示范（只示范技法、不示范成品）；每组一张步骤卡、一份材料包。
 - **混龄策略**：大孩子当“材料长”负责分发与回收，小孩子负责拼摆；给能力强的小组加“加一个机关/换两种材料”的挑战任务。
 - **巡视话术**：“你这一处贴得和别人都不一样，说说怎么想到的？”
 
-### 环节三 物成言立（约 ${t3} 分钟）
+### 环节三 物成言立（约占 ${P3}%）
 - **命名**：每人给作品取一个名字，先口头说，再写在作品卡上。
 - **讲述**：先说后写——教师示范一句“我的作品叫____，它最特别的是____”，儿童接一句，同伴追问一句。
 - **题诗**：把最想说的一句话折成两三行，**原样保留孩子的词**，不替孩子改。
 
-### 环节四 评鉴生新（约 ${t4} 分钟）
+### 环节四 评鉴生新（约占 ${P4}%）
 - **互评量规**（儿童听得懂）：① 名字和作品配不配；② 哪一处最让你想多看一眼；③ 如果再做一次，你会加什么？
 - 每组推荐一件作品展示，作者用一句话介绍；提出一条具体修改建议后**二次创作 5 分钟**。
 
@@ -446,7 +496,7 @@ ${matRows}
 
 ## 六、课堂组织建议
 - **空间**：${venue === '户外院落' ? '户外围坐成圈，材料放中央篮子里，随用随取' : venue === '活动室' ? '分岛式布局，每组一张桌子，展示区靠墙' : '课桌拼成 4—6 组，预留一条“展示走廊”'}。
-- **时间预案**：若课时不够，优先压缩教师讲解，**保留「物成言立」的表达环节**（可顺延到下课前 5 分钟快速进行）。
+- **时间预案**：若课时不够，优先压缩教师讲解，**保留「物成言立」的表达环节**（可顺延到下课前快速进行）。
 - **孩子不动手**：先递一种最有趣的材料请他“只摸不做”；仍不动手则任命为“记录员”。
 - **孩子说“我不会”**：回应“不用会做，先做你现在的样子”，并给半成品支架。
 - **抢材料**：设“材料长”岗位，用“轮流取一样”的规则替代哄抢。
@@ -454,7 +504,10 @@ ${matRows}
 ## 七、三维观察要点
 - **身体参与**：动作投入时长、精细动作（撕/剪/捏）的熟练度、操作节奏是否从容。
 - **环境参与**：与材料的互动方式（试探/探索/改造）、与同伴的互助与讲述次数。
-- **生成性**：是否出现超出示范的改法、“编错—重来”的调整痕迹、语言表达是否超出教师预设。`;
+- **生成性**：是否出现超出示范的改法、“编错—重来”的调整痕迹、语言表达是否超出教师预设。
+
+## 八、时间分配
+【时间分配】触材启思 ${P1}%｜手运心生 ${P2}%｜物成言立 ${P3}%｜评鉴生新 ${P4}%`;
     },
 
     scaffold(text) {
@@ -654,16 +707,18 @@ ${DB.project.parent}——${DB.project.parentSub}
         scrollBottom();
         await new Promise((r) => setTimeout(r, 18));
       }
+    } finally {
+      busy = false;
+      s.updatedAt = Date.now();
+      persist();
+      renderMessages(); renderModeChips();
     }
-    busy = false;
-    s.updatedAt = Date.now();
-    persist();
-    renderMessages(); renderModeChips();
   }
 
   function updateLastBubble(full) {
+    const alloc = timeAllocBar(full);
     const last = $('#msgs .msg-ai:last-child .md');
-    if (last) { last.innerHTML = MD.render(full); scrollBottom(); }
+    if (last) { last.innerHTML = MD.render(alloc ? alloc.clean : full); scrollBottom(); }
   }
 
   async function send(text, images) {
@@ -827,7 +882,7 @@ ${DB.project.parent}——${DB.project.parentSub}
 - 人数：${$('#fCount').value} 人
 - 课时：${$('#fDuration').value}
 - 场地：${$('#fVenue').value}
-- 现有材料：${mats}${$('#fTheme').value.trim() ? `\n- 期望主题：${$('#fTheme').value.trim()}` : ''}
+- 现有材料：${mats}${$('#fTheme').value.trim() ? `\n- 期望主题：${$('#fTheme').value.trim()}` : ''}${$('#fRegion').value.trim() ? `\n- 地域与在地资源：${$('#fRegion').value.trim()}` : ''}
 请严格按功能结构输出完整方案。`;
     closeOverlay('planOverlay');
     setMode('plan', true);
@@ -842,6 +897,10 @@ ${DB.project.parent}——${DB.project.parentSub}
 
   /* ═══════════ 启动 ═══════════ */
   function boot() {
+    // 恢复上次的对话（刷新/重开页面后直接续聊）
+    if (!activeId && sessions.length) activeId = sessions[0].id;
+    const cur = active();
+    if (cur && cur.mode) mode = cur.mode;
     renderModeChips();
     renderSuggests();
     renderHistory();

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>更新日志 · 手启心言</title>
+<link rel="preconnect" href="https://fonts.loli.net">
+<link href="https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@600;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232E6E67'/%3E%3C/svg%3E">
+<style>
+  .cl-item { background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 26px 30px; margin-bottom: 18px; box-shadow: var(--sh-sm); }
+  .cl-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .cl-ver { font-family: var(--serif); font-weight: 900; font-size: 18px; color: var(--teal-deep); background: var(--teal-soft); border-radius: 10px; padding: 5px 14px; }
+  .cl-date { font-size: 12px; color: var(--ink-faint); letter-spacing: .06em; }
+  .cl-tag { font-size: 10.5px; padding: 3px 11px; border-radius: 99px; background: var(--terra-soft); color: var(--terra-deep); }
+  .cl-list { margin-top: 14px; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .cl-list li { font-size: 13.5px; color: var(--ink-soft); padding-left: 18px; position: relative; line-height: 1.8; }
+  .cl-list li::before { content: ""; position: absolute; left: 2px; top: 11px; width: 7px; height: 7px; border-radius: 2px; background: var(--teal-mid); opacity: .55; }
+</style>
+</head>
+<body>
+<div id="railSlot"></div>
+<div id="mobileTopSlot"></div>
+<div class="main">
+  <div class="wrap">
+    <div class="page-head rv in">
+      <div class="page-eyebrow">CHANGELOG</div>
+      <h1 class="page-title">版本修订记录</h1>
+      <p class="page-desc">记录「手启心言」每一次迭代的改进与修复，修订意见来自指导老师与项目组成员的真实试用反馈。</p>
+    </div>
+
+    <div class="cl-item rv">
+      <div class="cl-head"><span class="cl-ver">v4.2</span><span class="cl-date">2026.11.10</span><span class="cl-tag">导师与团队反馈迭代</span></div>
+      <ul class="cl-list">
+        <li>四阶模式改为图形化流程图呈现：四节点 + 箭头串联 + 一句话说明 + 建议时间占比，信息更结构化（江老师意见）</li>
+        <li>课程时间由"分钟"改为"占比制"——各环节按全课百分比设计，教师按本校一课时（40/45/60 分钟）自行折算</li>
+        <li>智能体回复新增时间分配图示：识别输出中的占比数据，自动生成四阶彩色时间条</li>
+        <li>课程适配升级"地域与在地资源"：提示词融入乡镇儿童特点（留守、屏幕依赖、表达机会少）与本地材料/非遗资源，课前表单新增对应输入项</li>
+        <li>修复手机端对话中断问题：新增 90 秒网络超时保护，请求挂死自动降级本地引擎，按钮不再锁死</li>
+        <li>移动端适配重做：顶栏单行横滑导航不再折行，发送键移至左侧避让平台悬浮按钮</li>
+        <li>新增侧栏"美育快讯"（公开教育新闻，仅作教研参考）与本修订记录页</li>
+      </ul>
+    </div>
+
+    <div class="cl-item rv rv-d1">
+      <div class="cl-head"><span class="cl-ver">v4.1</span><span class="cl-date">2026.11.09</span><span class="cl-tag">演示细节优化</span></div>
+      <ul class="cl-list">
+        <li>隐藏模型接口设置入口，评委与教师视角零配置</li>
+        <li>生成等待新增"正在构思课程方案"提示，避免误以为卡死</li>
+        <li>团队新增成员王路洋（项目说明书撰写 · 路演录制 · 统筹协调）</li>
+      </ul>
+    </div>
+
+    <div class="cl-item rv rv-d2">
+      <div class="cl-head"><span class="cl-ver">v4.0</span><span class="cl-date">2026.11.09</span><span class="cl-tag">Kimi Code 重构上线</span></div>
+      <ul class="cl-list">
+        <li>全新设计系统：暖纸底 + 黛青 + 赭石的具身手工美学，全站统一视觉语言</li>
+        <li>智能体页全新交互：Kimi/Claude 式中央对话、欢迎说明卡、建议问题、流式输出、会话历史</li>
+        <li>作品数据库 / 教案库 / 研究工具库 / 文献库四大数据页同步重构</li>
+        <li>内置离线规则引擎：模型接口不可达时仍可演示三大核心功能</li>
+        <li>支持上传学生作品照片（自动压缩，多模态接口就绪）</li>
+      </ul>
+    </div>
+
+    <div style="height:50px"></div>
+  </div>
+  <div id="footerSlot"></div>
+</div>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/md.js"></script>
+<script src="assets/js/main.js"></script>
+<script>
+document.getElementById('railSlot').innerHTML = renderRail('changelog.html');
+document.getElementById('mobileTopSlot').innerHTML = renderMobileTop('changelog.html');
+document.getElementById('footerSlot').innerHTML = renderFooter();
+initReveal();
+</script>
+</body>
+</html>
