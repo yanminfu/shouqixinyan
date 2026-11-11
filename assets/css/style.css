@@ -980,6 +980,32 @@ a:hover > .brand-mark, .rail-brand:hover .brand-mark { transform: rotate(0deg) s
 .ai-act:hover { background: var(--teal-ghost); color: var(--teal-deep); }
 .ai-act svg { width: 14px; height: 14px; }
 
+/* 模型状态提示条（自动切换模型 / 未接通时的说明） */
+.ai-note {
+  display: flex; align-items: flex-start; gap: 8px;
+  margin: 0 0 10px; padding: 10px 14px;
+  border-radius: 12px; background: rgba(46, 110, 103, .06);
+  border: 1px solid rgba(46, 110, 103, .12);
+  font-size: 12.5px; line-height: 1.7; color: var(--ink-soft);
+}
+.ai-note svg { width: 15px; height: 15px; flex: none; margin-top: 2px; color: var(--teal); }
+.ai-note b { color: var(--ink); font-weight: 600; margin-right: 5px; }
+.ai-note.warn { background: rgba(192, 95, 53, .07); border-color: rgba(192, 95, 53, .16); }
+.ai-note.warn svg { color: var(--terra); }
+
+/* 重新生成 */
+.ai-foot { display: flex; align-items: center; gap: 10px; margin-top: 11px; }
+.ai-re {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--paper-2);
+  color: var(--ink-soft); font-size: 12.5px; font-family: inherit; cursor: pointer;
+  transition: all .18s;
+}
+.ai-re:hover { border-color: var(--teal); color: var(--teal-deep); background: var(--teal-ghost); transform: translateY(-1px); }
+.ai-re svg { width: 14px; height: 14px; }
+.ai-foot-tip { font-size: 11.5px; color: var(--ink-faint); }
+
 .msg-ai .bubble {
   background: var(--paper-2);
   border: 1px solid var(--line);
@@ -1171,7 +1197,7 @@ a:hover > .brand-mark, .rail-brand:hover .brand-mark { transform: rotate(0deg) s
 @media (max-width: 860px) {
   .chat-topbar { padding: 0 14px; gap: 10px; height: 54px; }
   .chat-topbar .t-sub { display: none; }
-  .chat-topbar .t-name { font-size: 15px; }
+  .chat-topbar .t-name { font-size: 15px; white-space: nowrap; }
   .status-pill { white-space: nowrap; font-size: 10.5px; padding: 4px 9px; }
   .icon-btn { width: 32px; height: 32px; }
   .msgs { padding: 16px 12px 12px; gap: 20px; }
@@ -1187,4 +1213,12 @@ a:hover > .brand-mark, .rail-brand:hover .brand-mark { transform: rotate(0deg) s
   .send-btn { order: -1; margin-left: 0; margin-right: 6px; flex: none; }
   .welcome-card li { font-size: 12px !important; }
   .chat-scroll { -webkit-overflow-scrolling: touch; }
+  .ai-foot { flex-wrap: wrap; gap: 8px; }
+  .ai-note { padding: 9px 12px; font-size: 12px; }
+}
+
+/* 窄屏对话顶栏：隐去类型标签，保证标题一行放下 */
+@media (max-width: 420px) {
+  .chat-topbar .t-tag { display: none; }
+  .chat-topbar { gap: 8px; }
 }
