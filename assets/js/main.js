@@ -124,7 +124,7 @@
       </div>
       <div class="footer-bottom">
         <span>© 2026 手启心言项目组 · 华中师范大学文学院</span>
-        <span>比赛版本 v4.0 · 2026.11.09</span>
+        <span>比赛版本 v4.7 · 2026.11.11</span>
       </div>
     </div></footer>`;
   };
@@ -177,24 +177,148 @@
 
   window.renderLessons = function () {
     const wrap = document.getElementById('lessonList');
-    wrap.innerHTML = DB.lessons.map((l, idx) => `
-      <article class="card card-hover lesson-card rv rv-d${(idx % 3) + 1}">
+    const st = window.__ls || (window.__ls = { tab: 'real', type: '全部' });
+    const extra = DB.lessonsExtra || [];
+    const types = ['全部', ...Array.from(new Set(DB.lessons.map((l) => l.group)))];
+    const list = st.tab === 'real'
+      ? (st.type === '全部' ? DB.lessons : DB.lessons.filter((l) => l.group === st.type))
+      : extra;
+
+    const places = Array.from(new Set(DB.lessons.map((l) => l.place.replace(/^湖北省武汉市/, ''))));
+    const span = [Math.min(...DB.lessons.map((l) => l.minutes)), Math.max(...DB.lessons.map((l) => l.minutes))];
+
+    const fmt = (s = '') => s.split('\n').map((x) => `<span class="ln">${x}</span>`).join('');
+    const acts = (s = '') => `<ul class="act">${s.split('\n')
+      .map((x) => x.replace(/^\d+[.、]\s*/, '').trim()).filter(Boolean)
+      .map((x) => `<li>${x}</li>`).join('')}</ul>`;
+
+    const head = `
+      <div class="lib-stats">
+        <div class="lib-stat"><b>${DB.lessons.length}</b><span>份真实课例</span></div>
+        <div class="lib-stat"><b>${places.length}</b><span>个授课场地</span></div>
+        <div class="lib-stat"><b>${span[0]}—${span[1]}</b><span>分钟 / 课时</span></div>
+        <div class="lib-stat"><b>4</b><span>阶递进环节</span></div>
+      </div>
+      <div class="lib-tabs">
+        <button class="lib-tab ${st.tab === 'real' ? 'on' : ''}" data-tab="real">新洲真实课例<span>${DB.lessons.length}</span></button>
+        <button class="lib-tab ${st.tab === 'extra' ? 'on' : ''}" data-tab="extra">其他教案<span>${extra.length}</span></button>
+      </div>`;
+
+    const typeBar = `
+      <div class="filter-bar lesson-filter">
+        <span class="filter-label">课型</span>
+        ${types.map((t) => `<button class="fchip ${t === st.type ? 'on' : ''}" data-t="type" data-v="${t}">${t}</button>`).join('')}
+        <span class="filter-count">当前 ${list.length} 份 · 环节时长按占比显示</span>
+      </div>`;
+
+    const extraNote = `
+      <div class="lib-note">教研构思稿，用于探索四阶模式的写法与创意，未在乡镇课堂实际授课。真实课例见「新洲真实课例」。</div>`;
+
+    const realCards = () => list.map((l, idx) => {
+      const total = l.minutes || l.stages.reduce((a, s) => a + s.minutes, 0) || 1;
+      const colors = ['var(--teal)', 'var(--teal-mid)', 'var(--amber)', 'var(--terra)'];
+      const segs = l.stages.map((s, i) => `<i style="width:${(s.minutes / total * 100).toFixed(2)}%;background:${colors[i]}"></i>`).join('');
+      const legend = l.stages.map((s, i) => `<span><i style="background:${colors[i]}"></i>${s.name} ${s.minutes}′ · ${Math.round(s.minutes / total * 100)}%</span>`).join('');
+      return `
+      <article class="card lesson-card lesson-real rv rv-d${(idx % 3) + 1}">
         <div class="lesson-head">
           <span class="lesson-id">${l.id}</span>
-          <div style="flex:1;min-width:220px">
-            <h3>《${l.title}》</h3>
+          <div class="lesson-titlewrap">
+            <h3>${l.title}</h3>
             <div class="lesson-metas">
-              <span class="chip chip-teal">${l.type}</span><span class="chip">${l.grades}</span><span class="chip chip-amber">${l.duration}</span>
+              <span class="chip chip-teal">${l.group}</span>${l.type !== l.group ? `<span class="chip">${l.type}</span>` : ''}<span class="chip">${l.grades}</span><span class="chip chip-amber">${l.duration}</span>
+            </div>
+            <div class="lesson-where">${l.date} · ${l.place.replace(/^湖北省武汉市/, '')} · 对应 ${l.researchQ}</div>
+          </div>
+        </div>
+        <div class="lesson-goal"><b>表达目标</b>${l.objectives.exp}</div>
+        <div class="ratio">
+          <div class="ratio-bar">${segs}</div>
+          <div class="ratio-legend">${legend}</div>
+        </div>
+        <div class="lesson-steps">${l.stages.map((s, i) => `
+          <div class="lstep"><i>环节 ${['一', '二', '三', '四'][i]} · ${s.minutes} 分钟</i><b>${s.name}</b><p>${s.intent}</p></div>`).join('')}
+        </div>
+        <div class="lesson-mats">${l.materials.map((m) => `<span class="chip" title="${m}">${m.length > 16 ? m.slice(0, 16) + '…' : m}</span>`).join('')}</div>
+        <button class="lesson-toggle" data-toggle>展开完整教案 <em>教师活动 · 学生活动 · 三维目标 · 教学反思</em></button>
+        <div class="lesson-detail" hidden>
+          <div class="ld-block">
+            <h4>教学目标</h4>
+            <dl class="ld-objs">
+              <div><dt>身体参与</dt><dd>${l.objectives.body}</dd></div>
+              <div><dt>环境参与</dt><dd>${l.objectives.env}</dd></div>
+              <div><dt>生成性</dt><dd>${l.objectives.gen}</dd></div>
+              <div><dt>表达与美育</dt><dd>${l.objectives.exp}</dd></div>
+            </dl>
+          </div>
+          <div class="ld-block">
+            <h4>教学准备</h4>
+            <ul class="ld-mats">${l.materials.map((m) => `<li>${m}</li>`).join('')}</ul>
+            <div class="ld-prep"><p><b>场地与设备</b>${fmt(l.prepare.space)}</p><p><b>前置经验</b>${fmt(l.prepare.prior)}</p><p><b>中介工具</b>${fmt(l.prepare.tools)}</p></div>
+          </div>
+          <div class="ld-block">
+            <h4>教学过程</h4>
+            ${l.stages.map((s, i) => `
+            <div class="ld-stage">
+              <div class="ld-stage-head"><b>（${['一', '二', '三', '四'][i]}）${s.name}</b><span>${s.minutes} 分钟 · ${Math.round(s.minutes / total * 100)}%</span></div>
+              <p class="ld-desc">${s.desc}</p>
+              <div class="ld-two">
+                <div><h5>教师活动</h5>${acts(s.teacher)}</div>
+                <div><h5>学生活动</h5>${acts(s.student)}</div>
+              </div>
+              <div class="ld-intent"><b>设计意图</b>${s.intent}</div>
+            </div>`).join('')}
+          </div>
+          <div class="ld-block">
+            <h4>教学反思</h4>
+            <div class="ld-reflect">
+              <p><b>效果评估</b>${l.reflect.effect}</p>
+              <p><b>问题与改进</b>${fmt(l.reflect.improve)}</p>
+              <p><b>具身化感受</b>${l.reflect.embodied}</p>
             </div>
           </div>
         </div>
-        <div class="lesson-goal"><b>课程目标：</b>${l.goal}</div>
+      </article>`;
+    }).join('');
+
+    const extraCards = () => list.map((l, idx) => `
+      <article class="card lesson-card rv rv-d${(idx % 3) + 1}">
+        <div class="lesson-head">
+          <span class="lesson-id">${l.id}</span>
+          <div class="lesson-titlewrap">
+            <h3>${l.title}</h3>
+            <div class="lesson-metas">
+              <span class="chip chip-teal">${l.type}</span><span class="chip">${l.grades}</span><span class="chip chip-amber">${l.duration}</span><span class="chip">教研构思稿</span>
+            </div>
+          </div>
+        </div>
+        <div class="lesson-goal"><b>课程目标</b>${l.goal}</div>
         <div class="lesson-steps">${l.steps.map((s, i) => `
           <div class="lstep"><i>环节 ${['一', '二', '三', '四'][i]}</i><b>${s.name}</b><p>${s.detail}</p></div>`).join('')}
         </div>
         <div class="lesson-mats">${l.materials.map((m) => `<span class="chip">${m}</span>`).join('')}</div>
-        <div class="lesson-tip"><b>实施提示：</b>${l.tip}</div>
+        <div class="lesson-tip"><b>实施提示</b>${l.tip}</div>
       </article>`).join('');
+
+    wrap.innerHTML = head + (st.tab === 'real' ? typeBar : extraNote) + (st.tab === 'real' ? realCards() : extraCards());
+
+    wrap.querySelector('.lib-tabs').addEventListener('click', (e) => {
+      const b = e.target.closest('.lib-tab'); if (!b) return;
+      st.tab = b.dataset.tab; st.type = '全部'; renderLessons();
+    });
+    const bar = wrap.querySelector('.lesson-filter');
+    if (bar) bar.addEventListener('click', (e) => {
+      const b = e.target.closest('.fchip'); if (!b) return;
+      st.type = b.dataset.v; renderLessons();
+    });
+    wrap.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-toggle]'); if (!btn) return;
+      const detail = btn.nextElementSibling;
+      const open = !detail.hidden;
+      detail.hidden = open;
+      btn.classList.toggle('on', !open);
+      btn.firstChild.textContent = open ? '展开完整教案 ' : '收起完整教案 ';
+    });
     initReveal();
   };
 
