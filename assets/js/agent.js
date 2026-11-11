@@ -38,18 +38,23 @@
   let currentProvider = 'deepseek';
 
   function loadKeys() { try { return JSON.parse(localStorage.getItem(KEYS_KEY) || '{}'); } catch { return {}; } }
+  const FALLBACK_PROVIDER = 'deepseek'; // 备用模型：当前模型不可用时自动接管，避免对话中断
+  function cfgFor(id) {
+    const p = PROVIDERS[id] || PROVIDERS[FALLBACK_PROVIDER];
+    const k = loadKeys()[id] || {};
+    return {
+      id,
+      baseUrl: p.baseUrl,
+      model: k.model || p.model,
+      apiKey: p.builtin ? BUILTIN_KEY : (k.key || p.key || ''),
+      vision: 'auto', // auto=自动尝试随消息发送图片；不支持时自动降级纯文本
+    };
+  }
   function loadCfg() {
     let saved = {};
     try { saved = JSON.parse(localStorage.getItem(CFG_KEY) || '{}'); } catch { /* 忽略 */ }
-    currentProvider = saved.provider && PROVIDERS[saved.provider] ? saved.provider : 'deepseek';
-    const p = PROVIDERS[currentProvider];
-    const keys = loadKeys()[currentProvider] || {};
-    return {
-      baseUrl: p.baseUrl,
-      model: keys.model || p.model,
-      apiKey: p.builtin ? BUILTIN_KEY : (keys.key || p.key || ''),
-      vision: 'auto', // auto=自动尝试随消息发送图片；不支持时自动降级纯文本
-    };
+    currentProvider = saved.provider && PROVIDERS[saved.provider] ? saved.provider : FALLBACK_PROVIDER;
+    return cfgFor(currentProvider);
   }
   function saveCfg() { localStorage.setItem(CFG_KEY, JSON.stringify({ provider: currentProvider })); }
 
@@ -71,7 +76,6 @@
   let mode = 'free'; // free | plan | scaffold | iterate
   let busy = false;
   let attachments = []; // {name, dataUrl}
-  let offlineNoted = false;
 
   const MODES = [
     { id: 'free', label: '自由对话', icon: 'chat' },
@@ -121,9 +125,17 @@
     const body = m.content
       ? `<div class="md ${busy && isLast ? 'streaming' : ''}">${MD.render(alloc ? alloc.clean : m.content)}</div>${alloc ? alloc.html : ''}`
       : `<div class="typing"><i></i><i></i><i></i></div><div class="think-hint">手启心言正在构思课程方案，首次生成约需 5—15 秒，请稍候…</div>`;
+    const notice = m.error
+      ? `<div class="ai-note warn">${ICONS.alert}<span><b>这条没能接通模型</b>${MD.esc(m.error)}，以下由站内知识库生成。</span></div>`
+      : (m.note ? `<div class="ai-note">${ICONS.alert}<span>${MD.esc(m.note)}</span></div>` : '');
+    const foot = !busy && isLast
+      ? `<div class="ai-foot"><button class="ai-re" data-act="re">${ICONS.refresh}${m.error ? '重试' : '重新生成'}</button><span class="ai-foot-tip">${m.error ? '换个模型或稍后再试' : '不满意可以重新生成一版'}</span></div>`
+      : '';
     return `<div class="msg msg-ai">
       <div class="ai-head"><div class="ai-ava">${ICONS.hand}</div><span class="ai-name">手启心言</span>${tools}</div>
+      ${notice}
       <div class="bubble">${body}</div>
+      ${foot}
     </div>`;
   }
 
@@ -217,29 +229,45 @@
     void cfg;
   }
 
-  async function callLLM(system, history, onToken) {
-    const cfg = loadCfg();
+  function netError(kind, message) { const e = new Error(message); e.kind = kind; return e; }
+
+  async function callLLM(system, history, onToken, cfgIn) {
+    const cfg = cfgIn || loadCfg();
     const tryImage = cfg.vision === 'auto' && !noImageModels.includes(cfg.model);
     const ctrl = new AbortController();
     const killer = setTimeout(() => ctrl.abort(), 90000); // 90 秒无响应判定网络挂死，触发离线降级
     try {
-      const res = await fetch(cfg.baseUrl.replace(/\/+$/, '') + '/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + cfg.apiKey },
-        signal: ctrl.signal,
-        body: JSON.stringify({
-          model: cfg.model, temperature: 0.4, stream: true,
-          messages: [{ role: 'system', content: system }, ...buildMessages(history, tryImage)],
-        }),
-      });
+      let res;
+      try {
+        res = await fetch(cfg.baseUrl.replace(/\/+$/, '') + '/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + cfg.apiKey },
+          signal: ctrl.signal,
+          body: JSON.stringify({
+            model: cfg.model, temperature: 0.4, stream: true,
+            messages: [{ role: 'system', content: system }, ...buildMessages(history, tryImage)],
+          }),
+        });
+      } catch (err) {
+        if (err.name === 'AbortError') throw netError('timeout', '90 秒内没有收到任何响应');
+        throw netError('blocked', '浏览器无法直连该接口（跨域限制或被网络拦截）');
+      }
       if (!res.ok) {
         const t = await res.text().catch(() => '');
         // 400 可能是多模态不支持：降级为纯文本重试一次
         if (res.status === 400 && tryImage) {
           noImageModels.push(cfg.model);
-          return callLLM(system, history, onToken);
+          return callLLM(system, history, onToken, cfg);
         }
-        throw new Error(`模型接口返回 ${res.status}：${t.slice(0, 120)}`);
+        let code = '';
+        try { code = (JSON.parse(t).error || {}).code || ''; } catch { /* 非 JSON 错误体 */ }
+        const blob = code + ' ' + t;
+        const kind = /ModelNotOpen|not activated|AccessDenied|PermissionDenied/i.test(blob) ? 'not_open'
+          : res.status === 401 || res.status === 403 ? 'auth'
+          : res.status === 429 ? 'quota'
+          : res.status === 404 ? 'not_found'
+          : 'http';
+        throw netError(kind, `HTTP ${res.status}${code ? ' · ' + code : ''}`);
       }
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
@@ -264,6 +292,19 @@
       return full;
     } finally {
       clearTimeout(killer);
+    }
+  }
+
+  function failReason(e, id) {
+    const name = (PROVIDERS[id] || {}).name || '模型';
+    switch (e && e.kind) {
+      case 'blocked': return `${name} 的接口不允许网页直接调用，需要中转服务`;
+      case 'not_open': return `${name} 的账号尚未开通该模型`;
+      case 'not_found': return `${name} 的模型名称不存在或未授权`;
+      case 'auth': return `${name} 的 API Key 无效或已过期`;
+      case 'quota': return `${name} 的调用额度不足或请求过于频繁`;
+      case 'timeout': return `${name} 响应超时`;
+      default: return `${name} 接口返回异常（${(e && e.message) || '未知错误'}）`;
     }
   }
 
@@ -503,25 +544,24 @@ ${rows}
 ${DB.project.parent}——${DB.project.parentSub}
 当前进行中：**${doing}**。三地（宜昌远安、咸宁崇阳白霓、武汉新洲）暑期实践资料正回溯编码入库，已有 ${DB.works.length} 件作品、${DB.lessons.length} 份教案入库。智能体将持续吸收新的教案与规则文档，变得越来越“懂”乡镇课堂。`;
       }
-      return `您好，我是手启心言。我主要可以帮您三件事：
+      if (/^(你好|您好|hi|hello|在吗|嗨|哈喽)/i.test(text.trim())) return `您好，我是手启心言。我主要可以帮您三件事：
 1. **课前·低资源课程适配**——告诉我年龄、人数、课时、材料、场地，生成四阶模式完整教案；
 2. **课中·表达支架**——描述孩子的作品，我给您层层递进的提问卡与命名、讲述、题诗支架；
 3. **课后·课堂迭代**——把课堂观察发给我，我按“身体参与—环境参与—生成性”三维诊断。
 也可以问我四阶模式、三维框架、材料替代、作品编码等项目问题。我们从哪一件开始？`;
+      return `这个问题我暂时没有把握直接回答。可以把它说得更具体些，或者从这三个入口开始：
+1. **课前·课程适配**——告诉我年龄、人数、课时、现有材料与场地，我按四阶模式生成完整方案；
+2. **课中·表达支架**——描述孩子的作品或一句原话，我给层层递进的提问卡；
+3. **课后·课堂迭代**——把课堂观察发我，我按“身体参与—环境参与—生成性”三维诊断。
+也可以直接问：四阶模式、三维框架、材料替代、作品编码。`;
     },
   };
 
   function offlineReply(text) {
-    let body;
-    if (mode === 'plan') body = Offline.plan(text);
-    else if (mode === 'scaffold') body = Offline.scaffold(text);
-    else if (mode === 'iterate') body = Offline.iterate(text);
-    else body = Offline.general(text);
-    if (!offlineNoted) {
-      offlineNoted = true;
-      return '> ⚠️ 模型接口暂时不可达，已进入**离线演示模式**：以下由内置规则引擎基于项目知识库生成，接入模型后将获得更完整的生成内容。\n\n' + body;
-    }
-    return body;
+    if (mode === 'plan') return Offline.plan(text);
+    if (mode === 'scaffold') return Offline.scaffold(text);
+    if (mode === 'iterate') return Offline.iterate(text);
+    return Offline.general(text);
   }
 
   /* ═══════════ 发送与接收 ═══════════ */
@@ -536,33 +576,46 @@ ${DB.project.parent}——${DB.project.parentSub}
     const history = s.msgs.filter((m) => m.content);
     busy = true;
     renderMessages(); renderModeChips();
-    const idx = s.msgs.length - 1;
+    const msg = s.msgs[s.msgs.length - 1];
+    msg.note = ''; msg.error = '';
+    const feed = (full) => { msg.content = full; updateLastBubble(full); };
+    let answered = false;
+    let fail = null;
     try {
-      await callLLM(systemNow(), history, (full) => {
-        s.msgs[idx].content = full;
-        updateLastBubble(full);
-      });
-      if (!s.msgs[idx].content) s.msgs[idx].content = '（刚才走神了，请再问一次）';
+      await callLLM(systemNow(), history, feed);
+      answered = true;
     } catch (e) {
-      console.warn('[手启心言] 接口调用失败，降级为本地引擎：', e.message);
+      fail = e;
+      console.warn('[手启心言] 模型调用失败：', e.message);
+      // 备用接管：当前模型不可用时改用内置默认模型，报告里注明原因
+      if (currentProvider !== FALLBACK_PROVIDER) {
+        msg.content = '';
+        try {
+          await callLLM(systemNow(), history, feed, cfgFor(FALLBACK_PROVIDER));
+          answered = true;
+          msg.note = `${failReason(e, currentProvider)}，本条已自动由 ${PROVIDERS[FALLBACK_PROVIDER].name} 生成。`;
+        } catch (e2) { fail = e2; }
+      }
+    }
+    if (!answered) {
+      msg.error = failReason(fail, currentProvider);
       const lastUser = [...history].reverse().find((m) => m.role === 'user');
       const fallback = offlineReply(lastUser ? lastUser.content : '');
       // 离线引擎逐段“打字”输出，保持演示质感
       const chunks = fallback.match(/[\s\S]{1,24}/g) || [fallback];
-      let acc = '';
+      msg.content = '';
       for (const c of chunks) {
-        acc += c;
-        s.msgs[idx].content = acc;
-        updateLastBubble(acc);
+        msg.content += c;
+        updateLastBubble(msg.content);
         scrollBottom();
-        await new Promise((r) => setTimeout(r, 18));
+        await new Promise((r) => setTimeout(r, 12));
       }
-    } finally {
-      busy = false;
-      s.updatedAt = Date.now();
-      persist();
-      renderMessages(); renderModeChips();
     }
+    if (!msg.content) msg.content = '（刚才走神了，请再问一次）';
+    busy = false;
+    s.updatedAt = Date.now();
+    persist();
+    renderMessages(); renderModeChips();
   }
 
   function updateLastBubble(full) {
@@ -726,7 +779,6 @@ ${DB.project.parent}——${DB.project.parentSub}
   function newChat() {
     if (busy) return;
     activeId = null;
-    offlineNoted = false;
     renderMessages(); renderHistory();
     input.focus();
   }
@@ -750,7 +802,6 @@ ${DB.project.parent}——${DB.project.parentSub}
       activeId = item.dataset.id;
       const s = active();
       mode = s.mode || 'free';
-      offlineNoted = true;
       renderModeChips(); renderHistory(); renderMessages();
     }
   });
@@ -850,6 +901,8 @@ ${DB.project.parent}——${DB.project.parentSub}
     renderHistory();
     renderMessages();
     autoGrow();
+    loadCfg();      // 从本机读取上次选择的模型
+    setModelPill();
     setStatus('就绪');
 
     // URL 参数：?mode=plan|scaffold|iterate&q=...
