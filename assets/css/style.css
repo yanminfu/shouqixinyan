@@ -428,7 +428,7 @@ a:hover > .brand-mark, .rail-brand:hover .brand-mark { transform: rotate(0deg) s
 
 /* 三维框架 */
 .tri-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
-.tri-card { padding: 30px 28px; border-radius: var(--r-lg); border: 1px solid var(--line); background: var(--paper-2); transition: all .3s var(--ease-out); position: relative; }
+.tri-card { padding: 30px 28px; border-radius: var(--r-lg); border: 1px solid var(--line); background: var(--paper-2); transition: all .3s var(--ease-out); position: relative; display: flex; flex-direction: column; }
 .tri-card:hover { transform: translateY(-5px); box-shadow: var(--sh-md); }
 .tri-ico {
   width: 46px; height: 46px; border-radius: 14px;
@@ -439,8 +439,8 @@ a:hover > .brand-mark, .rail-brand:hover .brand-mark { transform: rotate(0deg) s
 .tri-ico svg { width: 23px; height: 23px; }
 .tri-card h3 { font-size: 19px; font-weight: 900; letter-spacing: .08em; }
 .tri-card .en { font-size: 10.5px; letter-spacing: .16em; color: var(--ink-faint); text-transform: uppercase; }
-.tri-card p { margin-top: 12px; font-size: 13.5px; color: var(--ink-soft); }
-.tri-items { margin-top: 14px; display: flex; flex-direction: column; gap: 7px; }
+.tri-card p { margin-top: 12px; font-size: 13.5px; color: var(--ink-soft); flex: 1; }
+.tri-items { margin-top: 18px; display: flex; flex-direction: column; gap: 7px; }
 .tri-items span { font-size: 12px; color: var(--ink-soft); background: var(--paper); border: 1px solid var(--line-soft); border-radius: 8px; padding: 6px 11px; }
 
 /* 三地 */
@@ -456,6 +456,10 @@ a:hover > .brand-mark, .rail-brand:hover .brand-mark { transform: rotate(0deg) s
 .site-card h3 { font-size: 18px; font-weight: 900; letter-spacing: .06em; }
 .site-card .desc { font-size: 13px; color: var(--ink-soft); margin-top: 8px; }
 .site-meta { margin-top: 16px; display: flex; gap: 8px; flex-wrap: wrap; }
+.site-card { display: flex; flex-direction: column; }
+.site-count { margin-top: auto; padding-top: 14px; border-top: 1px dashed var(--line-soft); display: flex; gap: 20px; }
+.site-count span { font-size: 11.5px; color: var(--ink-faint); letter-spacing: .04em; }
+.site-count b { font-family: var(--serif); font-size: 17px; color: var(--sc, var(--teal-deep)); margin-right: 4px; }
 
 /* 时间线 */
 .timeline { max-width: 760px; margin: 0 auto; position: relative; padding-left: 34px; }
