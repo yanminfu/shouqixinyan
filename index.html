@@ -30,9 +30,9 @@
           <a class="btn btn-ghost" href="#four"><span id="ctaIcon2"></span>了解四阶模式</a>
         </div>
         <div class="hero-stats rv rv-d4">
-          <div class="hstat"><b>12</b><span>学生作品入库（示例）</span></div>
-          <div class="hstat"><b>12</b><span>真实课例入库</span></div>
-          <div class="hstat"><b>3</b><span>乡镇实践点位</span></div>
+          <div class="hstat"><b id="statWorks">12</b><span>学生作品入库</span></div>
+          <div class="hstat"><b id="statLessons">16</b><span>真实课例入库</span></div>
+          <div class="hstat"><b id="statSites">3</b><span>乡镇实践点位</span></div>
           <div class="hstat"><b>4×3</b><span>阶段×维度框架</span></div>
         </div>
       </div>
@@ -212,12 +212,23 @@ $('dimGrid', DB.threeDims.map((d, i) => `
     <div class="tri-items">${d.items.map((x) => `<span>${x}</span>`).join('')}</div>
   </div>`).join(''));
 
-$('siteGrid', DB.sites.map((s, i) => `
+$('siteGrid', DB.sites.map((s, i) => {
+  const works = DB.works.filter((w) => w.site === s.name).length;
+  const lessons = DB.lessons.filter((l) => l.site === s.name).length;
+  return `
   <div class="site-card rv rv-d${i + 1}" data-code="${s.code}" style="--sc:${s.color}">
     <h3>${s.name}</h3>
     <div class="desc">${s.desc}</div>
     <div class="site-meta">${s.meta.map((m) => `<span class="chip">${m}</span>`).join('')}</div>
-  </div>`).join(''));
+    <div class="site-count">
+      <span><b>${works}</b> 件作品</span><span><b>${lessons}</b> 份教案</span>
+    </div>
+  </div>`;
+}).join(''));
+
+$('statWorks', DB.works.length);
+$('statLessons', DB.lessons.length);
+$('statSites', DB.sites.length);
 
 $('timelineWrap', DB.stages.map((s) => `
   <div class="tl-item ${s.status === 'doing' ? 'doing' : s.status === 'done' ? 'done' : ''} rv">
