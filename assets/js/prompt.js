@@ -152,17 +152,18 @@
 
   function projectContext(DB) {
     const doing = DB.stages.filter((s) => s.status === 'doing').map((s) => `${s.name}（${s.span}）`).join('；');
-    const lessonList = DB.lessons.map((l) => `《${l.title}》${l.type}/${l.grades}/${l.duration}（${l.stages.map((s) => s.name + s.minutes + '′').join('·')}）`).join('；');
+    const lessonList = DB.lessons.map((l) => `《${l.title}》${l.site}/${l.type}/${l.grades}/${l.duration}（${l.stages.map((s) => s.name + s.minutes + '′').join('·')}）`).join('；');
     const extraList = (DB.lessonsExtra || []).map((l) => `《${l.title}》${l.type}`).join('、');
+    const siteCount = Array.from(new Set(DB.lessons.map((l) => l.site))).join('、');
     const workList = DB.works.slice(0, 6).map((w) => `《${w.title}》${w.id}·${w.site}·${w.type}`).join('；');
     const toolList = DB.tools.map((t) => `${t.name}[${t.status}]`).join('；');
     return `# 项目知识库（回答项目相关问题时使用）
 
 本项目：${DB.project.parent}——${DB.project.parentSub}（${DB.project.competition}，${DB.project.period}）。
 当前进行中阶段：${doing}。
-教案库（${DB.lessons.length} 份武汉新洲真实课例，均为 2026 年 7 月实际授课记录）：${lessonList}。
-另有教研构思稿 ${(DB.lessonsExtra || []).length} 份（未实际上课，仅作写法参考）：${extraList}。
-作品数据库（${DB.works.length} 件示例，三维地点为宜昌远安、咸宁崇阳白霓、武汉新洲）：${workList} 等。
+教案库（${DB.lessons.length} 份实际授课课例，来自${siteCount}，均为 2026 年暑期现场记录）：${lessonList}。
+另有其他来源教案 ${(DB.lessonsExtra || []).length} 份（非本项目课程实施记录，仅作写法参考）：${extraList}。
+作品数据库（${DB.works.length} 件，已化名；地点为宜昌远安、咸宁崇阳白霓、武汉新洲）：${workList} 等。
 研究工具：${toolList}。
 参考文献 ${DB.references.length} 条，涵盖具身认知、创造力测评、双重编码、政策文件四类。
 团队成员：${DB.project.team.join('、')}；指导教师：${DB.project.advisor}。
