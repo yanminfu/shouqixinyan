@@ -64,7 +64,15 @@ powershell Compress-Archive -Path publish\* -DestinationPath site-bundle.zip -Fo
 ~/.kimi-work/bin/kimix.exe website publish <网站ID> static site-bundle.zip --wait
 ```
 
-**GitHub Pages**：推送本仓库后在 Settings → Pages 选择 `main` 分支根目录即可（纯静态无需构建）。
+**GitHub Pages（免费、无水印）**：仓库根目录即站点根，纯静态无需构建，`Settings → Pages → Source: Deploy from a branch → main / (root)` 保存即可，约 1 分钟后访问 `https://<用户名>.github.io/<仓库名>/`。
+
+部署前已做的适配：
+
+- 全部资源使用相对路径（无 `/assets/...` 绝对路径、无外部 CDN），可直接在子路径 `/仓库名/` 下运行
+- 根目录 `.nojekyll` 空文件：关闭 Jekyll 处理，避免下划线开头的文件/目录被丢弃
+- `.gitignore` 已排除 `publish/`、`site-bundle.zip`、`backup-*.zip`，仓库体积约 1 MB
+
+**注意**：Pages 免费额度要求仓库为 **public**，而 `assets/js/agent.js` 中内置的模型 Key 会随源码公开（与 kimi.link 版"查看源码可见"性质相同，但公开仓库会被爬虫扫到）。建议赛后轮换 Key，或在模型控制台设置用量限额；需要彻底隐藏 Key 时改为 `server/` 代理或 Cloudflare Worker 中转。
 
 ---
 
