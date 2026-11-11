@@ -124,7 +124,7 @@
       </div>
       <div class="footer-bottom">
         <span>© 2026 手启心言项目组 · 华中师范大学文学院</span>
-        <span>比赛版本 v4.7 · 2026.11.11</span>
+        <span>比赛版本 v4.8 · 2026.11.11</span>
       </div>
     </div></footer>`;
   };
@@ -177,14 +177,17 @@
 
   window.renderLessons = function () {
     const wrap = document.getElementById('lessonList');
-    const st = window.__ls || (window.__ls = { tab: 'real', type: '全部' });
+    const st = window.__ls || (window.__ls = { tab: 'real', type: '全部', site: '全部' });
     const extra = DB.lessonsExtra || [];
     const types = ['全部', ...Array.from(new Set(DB.lessons.map((l) => l.group)))];
+    const sites = ['全部', ...Array.from(new Set(DB.lessons.map((l) => l.site)))];
     const list = st.tab === 'real'
-      ? (st.type === '全部' ? DB.lessons : DB.lessons.filter((l) => l.group === st.type))
+      ? DB.lessons
+        .filter((l) => st.site === '全部' || l.site === st.site)
+        .filter((l) => st.type === '全部' || l.group === st.type)
       : extra;
 
-    const places = Array.from(new Set(DB.lessons.map((l) => l.place.replace(/^湖北省武汉市/, ''))));
+    const places = Array.from(new Set(DB.lessons.map((l) => l.place)));
     const span = [Math.min(...DB.lessons.map((l) => l.minutes)), Math.max(...DB.lessons.map((l) => l.minutes))];
 
     const fmt = (s = '') => s.split('\n').map((x) => `<span class="ln">${x}</span>`).join('');
@@ -200,19 +203,21 @@
         <div class="lib-stat"><b>4</b><span>阶递进环节</span></div>
       </div>
       <div class="lib-tabs">
-        <button class="lib-tab ${st.tab === 'real' ? 'on' : ''}" data-tab="real">新洲真实课例<span>${DB.lessons.length}</span></button>
-        <button class="lib-tab ${st.tab === 'extra' ? 'on' : ''}" data-tab="extra">其他教案<span>${extra.length}</span></button>
+        <button class="lib-tab ${st.tab === 'real' ? 'on' : ''}" data-tab="real">实际授课课例<span>${DB.lessons.length}</span></button>
+        <button class="lib-tab ${st.tab === 'extra' ? 'on' : ''}" data-tab="extra">其他来源教案<span>${extra.length}</span></button>
       </div>`;
 
     const typeBar = `
       <div class="filter-bar lesson-filter">
-        <span class="filter-label">课型</span>
+        <span class="filter-label">地点</span>
+        ${sites.map((t) => `<button class="fchip ${t === st.site ? 'on' : ''}" data-t="site" data-v="${t}">${t.replace(/^湖北省/, '')}</button>`).join('')}
+        <span class="filter-label" style="margin-left:10px">课型</span>
         ${types.map((t) => `<button class="fchip ${t === st.type ? 'on' : ''}" data-t="type" data-v="${t}">${t}</button>`).join('')}
         <span class="filter-count">当前 ${list.length} 份 · 环节时长按占比显示</span>
       </div>`;
 
     const extraNote = `
-      <div class="lib-note">教研构思稿，用于探索四阶模式的写法与创意，未在乡镇课堂实际授课。真实课例见「新洲真实课例」。</div>`;
+      <div class="lib-note">其他来源教案：包括教研构思稿与其他来源的课例，未在本项目乡镇课堂实际实施，保留作四阶写法与创意参考。实际上课记录见「实际授课课例」。</div>`;
 
     const realCards = () => list.map((l, idx) => {
       const total = l.minutes || l.stages.reduce((a, s) => a + s.minutes, 0) || 1;
@@ -226,9 +231,9 @@
           <div class="lesson-titlewrap">
             <h3>${l.title}</h3>
             <div class="lesson-metas">
-              <span class="chip chip-teal">${l.group}</span>${l.type !== l.group ? `<span class="chip">${l.type}</span>` : ''}<span class="chip">${l.grades}</span><span class="chip chip-amber">${l.duration}</span>
+              <span class="chip chip-teal">${l.site}</span><span class="chip">${l.type}</span><span class="chip">${l.grades}</span><span class="chip chip-amber">${l.duration}</span>
             </div>
-            <div class="lesson-where">${l.date} · ${l.place.replace(/^湖北省武汉市/, '')} · 对应 ${l.researchQ}</div>
+            <div class="lesson-where">${l.date} · ${l.place.replace(/^湖北省/, '').replace(/爱心托管班$/, '')} · 对应 ${l.researchQ}</div>
           </div>
         </div>
         <div class="lesson-goal"><b>表达目标</b>${l.objectives.exp}</div>
@@ -288,7 +293,7 @@
           <div class="lesson-titlewrap">
             <h3>${l.title}</h3>
             <div class="lesson-metas">
-              <span class="chip chip-teal">${l.type}</span><span class="chip">${l.grades}</span><span class="chip chip-amber">${l.duration}</span><span class="chip">教研构思稿</span>
+              <span class="chip chip-teal">${l.type}</span><span class="chip">${l.grades}</span><span class="chip chip-amber">${l.duration}</span><span class="chip">其他来源</span>
             </div>
           </div>
         </div>
@@ -304,12 +309,12 @@
 
     wrap.querySelector('.lib-tabs').addEventListener('click', (e) => {
       const b = e.target.closest('.lib-tab'); if (!b) return;
-      st.tab = b.dataset.tab; st.type = '全部'; renderLessons();
+      st.tab = b.dataset.tab; st.type = '全部'; st.site = '全部'; renderLessons();
     });
     const bar = wrap.querySelector('.lesson-filter');
     if (bar) bar.addEventListener('click', (e) => {
       const b = e.target.closest('.fchip'); if (!b) return;
-      st.type = b.dataset.v; renderLessons();
+      st[b.dataset.t] = b.dataset.v; renderLessons();
     });
     wrap.addEventListener('click', (e) => {
       const btn = e.target.closest('[data-toggle]'); if (!btn) return;
