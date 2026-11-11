@@ -74,6 +74,14 @@ powershell Compress-Archive -Path publish\* -DestinationPath site-bundle.zip -Fo
 
 **注意**：Pages 免费额度要求仓库为 **public**，而 `assets/js/agent.js` 中内置的模型 Key 会随源码公开（与 kimi.link 版"查看源码可见"性质相同，但公开仓库会被爬虫扫到）。建议赛后轮换 Key，或在模型控制台设置用量限额；需要彻底隐藏 Key 时改为 `server/` 代理或 Cloudflare Worker 中转。
 
+日常更新（改完本地文件后一条命令即可上线，GitHub 自动重建约 40 秒）：
+
+```bash
+git add -A && git commit -m "描述本次修改" && git push
+```
+
+> 国内网络环境下 `github.com` 的 DNS 偶尔指向不可达 IP，可用 `server/fix-github-hosts.ps1`（需管理员）临时修正，脚本写入的行以 `# shouqixinyan-github-pages` 标记，删除该行即恢复。
+
 ---
 
 项目团队：严泯福 · 管乾宇 · 高琳蕊 · 许睿涵 · 蔡明涵 · 王路洋 ｜ 指导老师：江雪 ｜ 华中师范大学文学院
