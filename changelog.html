@@ -17,6 +17,7 @@
   .cl-list { margin-top: 14px; list-style: none; display: flex; flex-direction: column; gap: 8px; }
   .cl-list li { font-size: 13.5px; color: var(--ink-soft); padding-left: 18px; position: relative; line-height: 1.8; }
   .cl-list li::before { content: ""; position: absolute; left: 2px; top: 11px; width: 7px; height: 7px; border-radius: 2px; background: var(--teal-mid); opacity: .55; }
+  .cl-list a { color: var(--teal-deep); border-bottom: 1px solid rgba(46,110,103,.32); }
 </style>
 </head>
 <body>
@@ -28,6 +29,15 @@
       <div class="page-eyebrow">CHANGELOG</div>
       <h1 class="page-title">版本修订记录</h1>
       <p class="page-desc">记录「手启心言」每一次迭代的改进与修复，修订意见来自指导老师与项目组成员的真实试用反馈。</p>
+    </div>
+
+    <div class="cl-item rv">
+      <div class="cl-head"><span class="cl-ver">v4.5</span><span class="cl-date">2026.11.11</span><span class="cl-tag">独立托管</span></div>
+      <ul class="cl-list">
+        <li>站点启用 GitHub Pages 独立托管：<a href="https://yanminfu.github.io/shouqixinyan/" target="_blank" rel="noopener">yanminfu.github.io/shouqixinyan</a>，页面无第三方角标与注入元素，视觉更完整</li>
+        <li>源码同步开源托管，历次迭代可追溯；本地修改推送后站点约 40 秒自动重建</li>
+        <li>原托管地址保留为备用线路，两条线路内容一致，答辩现场可随时切换</li>
+      </ul>
     </div>
 
     <div class="cl-item rv">
